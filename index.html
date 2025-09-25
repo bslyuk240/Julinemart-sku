@@ -20,21 +20,21 @@
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, #0b0f14, #0a0d12 60%, #0c1017); color: var(--text); }
     header { padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(11,15,20,0.8); backdrop-filter: blur(8px); z-index: 5; display:flex; align-items:center; gap:8px; }
     h1 { margin: 0; font-size: 20px; letter-spacing: 0.4px; }
-    .container { max-width: 1100px; margin: 20px auto; padding: 0 16px 40px; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 16px 40px; }
     .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 900px) { .grid { grid-template-columns: 1.1fr 1fr; } }
+    @media (min-width: 1100px) { .grid { grid-template-columns: 1.1fr 1fr; } }
     .card { background: linear-gradient(180deg, #121822, #0f1620); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
     .card h2 { margin: 0 0 12px 0; font-size: 18px; }
     label { display: block; margin: 10px 0 6px; color: var(--muted); font-size: 13px; }
-    select, input[type=text], input[type=number] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); outline: none; }
-    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    select, input[type=text], input[type=number], input[type=url] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); outline: none; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,44,172,0.25); }
     .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    @media (min-width: 680px) { .row-2 { grid-template-columns: 1fr 1fr; } .row-3 { grid-template-columns: 1fr 1fr 1fr; } }
+    @media (min-width: 800px) { .row-2 { grid-template-columns: 1fr 1fr; } .row-3 { grid-template-columns: 1fr 1fr 1fr; } }
     .muted { color: var(--muted); font-size: 12px; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
     button { padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); cursor: pointer; }
-    .primary { background: var(--accent); border-color: #2e69d1; }
-    .success { background: var(--accent-2); border-color: #0d9b70; }
+    .primary { background: var(--accent); border-color: #3e2492; }
+    .success { background: var(--accent-2); border-color: #e67627; color: #0b0f14; }
     .warn { background: var(--warn); border-color: #cc7e09; color: #0b0f14; }
     .danger { background: var(--danger); border-color: #c03535; }
     .pill { display:inline-block; padding: 4px 8px; border-radius: 999px; font-size: 11px; border:1px solid var(--border); background:#0b111a; color:var(--muted) }
@@ -45,11 +45,13 @@
     tr:hover td { background: rgba(255,255,255,0.03); }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background: #0b111a; border:1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
     .sku { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .ok { color: var(--accent-2); }
+    .ok { color: #8cf0c6; }
     .bad { color: var(--danger); }
     .note { margin-top: 6px; font-size: 12px; }
     .footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
   </style>
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <header>
@@ -95,6 +97,14 @@
             <input type="text" id="sku" class="sku" readonly />
           </div>
         </div>
+        <div class="row row-2">
+          <div>
+            <label>Product URL (optional – e.g., https://julinemart.com/product/...)</label>
+            <input type="url" id="productUrl" placeholder="https://julinemart.com/product/..." />
+            <div class="note muted">If provided, QR will point directly to this URL. If empty, QR uses <span class="kbd">/p/&lt;SKU&gt;</span> which will redirect using <span class="kbd">sku-map.json</span>.</div>
+          </div>
+          <div></div>
+        </div>
         <div id="status" class="note"></div>
         <div class="actions">
           <button class="primary" id="suggestBtn">Suggest Number</button>
@@ -120,7 +130,9 @@
           <button id="resetFilters">Reset</button>
           <button id="exportCsv">Export CSV</button>
           <button class="warn" id="importCsv">Import CSV</button>
-          <input type="file" id="csvFile" accept=".csv" style="display:none" />
+          <input type="file" id="csvFile" accept=".csv,.json" style="display:none" />
+          <button id="exportMap">Export sku-map.json</button>
+          <button id="importMap">Import sku-map.json</button>
         </div>
         <div class="list">
           <table>
@@ -129,8 +141,9 @@
                 <th>SKU</th>
                 <th>Category</th>
                 <th>Vendor</th>
-                <th>Number</th>
+                <th>No.</th>
                 <th>Product</th>
+                <th>URL</th>
                 <th>Created</th>
                 <th></th>
               </tr>
@@ -138,7 +151,28 @@
             <tbody id="tableBody"></tbody>
           </table>
         </div>
-        <div class="footer">Storage: Local (browser). Netlify + Supabase sync is the next step; this UI is ready for it.</div>
+        <div class="footer">Storage: Local (browser). Export <span class="kbd">sku-map.json</span> and commit to GitHub for public redirects. Supabase sync is next.</div>
+
+      <div class="card">
+        <h2>Cloud Sync (Supabase)</h2>
+        <div class="row row-2">
+          <div>
+            <label>SUPABASE_URL</label>
+            <input type="text" id="sbUrl" placeholder="https://xxxxxx.supabase.co" />
+          </div>
+          <div>
+            <label>SUPABASE_ANON_KEY</label>
+            <input type="text" id="sbKey" placeholder="eyJhbGciOi..." />
+          </div>
+        </div>
+        <div class="actions">
+          <button id="sbConnect" class="primary">Connect</button>
+          <button id="sbPull">Pull (cloud ➜ local)</button>
+          <button id="sbPush" class="warn">Push (local ➜ cloud)</button>
+          <button id="sbLive">Enable Live Sync</button>
+          <button id="sbDownloadSql">Download schema.sql</button>
+        </div>
+        <div class="note muted">Paste your Supabase project URL + anon key (stored only on this device). We’ll upsert to a <span class="kbd">skus</span> table with a unique index on <span class="kbd">sku</span>.</div>
       </div>
 
       <div class="card">
@@ -153,7 +187,7 @@
   <div id="printArea" style="display:none"></div>
 
   <script>
-    // ===== Public route handler: /p/<SKU> redirects via sku-map.json if available =====
+    // ===== Public route handler: /p/<SKU> redirects via Supabase if available =====
     (function handlePublicRoute(){
       try {
         var path = String(location.pathname || '');
@@ -162,7 +196,6 @@
         var m = path.match(re);
         if (!m) return; // not a public product route
         var sku = m[1].toUpperCase();
-        // Build a full-screen overlay so we don't depend on app UI existing
         var css = document.createElement('style');
         css.textContent = '.overlay{position:fixed;inset:0;background:#0b0f14;color:#e8eefc;display:flex;align-items:center;justify-content:center;padding:24px}'+
                           '.box{max-width:680px;width:100%;background:linear-gradient(180deg,#121822,#0f1620);border:1px solid #1f2937;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}'+
@@ -176,7 +209,7 @@
         wrap.innerHTML = '<div class="box">'+
           '<div class="row">Opening product…</div>'+
           '<div class="row sku" id="ovSku">'+sku+'</div>'+
-          '<div class="row" id="ovMsg">Checking product mapping…</div>'+
+          '<div class="row" id="ovMsg">Checking cloud mapping…</div>'+
           '<div class="btns">'+
             '<button class="btn accent" id="ovCopy">Copy SKU</button>'+
             '<a class="btn" id="ovHome" href="https://julinemart.com" target="_self">Go to JulineMart</a>'+
@@ -186,20 +219,27 @@
         var msg = document.getElementById('ovMsg');
         var copyBtn = document.getElementById('ovCopy');
         copyBtn.onclick = function(){ if (navigator.clipboard) { navigator.clipboard.writeText(sku).then(function(){ msg.textContent = 'Copied '+sku+' ✅'; }).catch(function(){ msg.textContent='Copy failed — use long‑press to copy.'; }); } };
-        // Try to load mapping file from the same site
-        fetch('./sku-map.json', { cache: 'no-store' }).then(function(r){
-          if (!r.ok) throw new Error('no map');
-          return r.json();
-        }).then(function(map){
-          var url = map && map[sku];
-          if (url){ msg.textContent = 'Redirecting to product page…'; location.replace(url); }
-          else { msg.textContent = 'No product page linked to this SKU yet.'; }
-        }).catch(function(){ msg.textContent = 'No SKU mapping file found (sku-map.json).'; });
+        // === Supabase query ===
+        var cfgStr = localStorage.getItem('jm_supabase_cfg_v1');
+        if (!cfgStr){ msg.textContent = 'Supabase not configured. Please set it up in the SKU app.'; return; }
+        var cfg = {};
+        try{ cfg = JSON.parse(cfgStr); }catch{}
+        if (!cfg.url || !cfg.key){ msg.textContent = 'Supabase config missing.'; return; }
+        var sb = window.supabase.createClient(cfg.url, cfg.key, { auth:{persistSession:false} });
+        sb.from('skus').select('product_url').eq('sku', sku).maybeSingle().then(function(res){
+          if (res.error){ msg.textContent = 'Error fetching from Supabase: '+res.error.message; return; }
+          if (res.data && res.data.product_url){
+            msg.textContent = 'Redirecting to product page…';
+            location.replace(res.data.product_url);
+          } else {
+            msg.textContent = 'No product page linked to this SKU yet.';
+          }
+        });
       } catch(e) { /* ignore */ }
     })();
+
     // ===== Category Map (from your list) =====
     const CATEGORY_MAP = {
-      // Fashion & Accessories
       "Fashion & Accessories": "FAS",
       "Bags": "BAG",
       "Caps & Hats": "HAT",
@@ -211,14 +251,12 @@
       "Women’s Clothing": "WMN",
       "Footwear": "FTW",
       "Traditional Wear": "TRD",
-      // Automotive
       "Automotive (General)": "AUT",
       "Engine Oil & Fluids": "OIL",
       "Car Accessories": "CAR",
       "Car Electronics": "CEL",
       "Tyres & Batteries": "TYR",
       "Motorcycle Parts": "MOT",
-      // Electronics
       "Electronics (General)": "ELE",
       "Gaming Consoles": "GAM",
       "Accessories (Chargers, Cables, Earphones)": "ACC",
@@ -228,14 +266,12 @@
       "Tablets": "TAB",
       "Televisions": "TVS",
       "Wearable Tech (Smartwatches)": "SMT",
-      // Home & Living
       "Home & Living (General)": "HOM",
       "Bathroom Accessories": "BTH",
       "Bedding & Linen": "BED",
       "Furniture": "FUR",
       "Home Décor": "DEC",
       "Kitchen Appliances": "KIT",
-      // Grocery & Foodstuff
       "Grocery & Foodstuff (General)": "GRC",
       "Drinks & Beverages": "DRK",
       "Grains & Cereals": "GRN",
@@ -243,7 +279,6 @@
       "Packaged Food": "PKG",
       "Snacks": "SNK",
       "Spices & Seasoning": "SPC",
-      // Beauty & Personal Care
       "Beauty & Personal Care (General)": "BEA",
       "Grooming Tools": "GRM",
       "Haircare": "HAI",
@@ -252,33 +287,28 @@
       "Lighting": "LGT",
       "Sanitary Products": "SAN",
       "Skincare": "SKN",
-      // Tools & Industrial
       "Tools & Industrial (General)": "TOL",
       "Building Materials": "BLD",
       "Electrical Tools": "ELC",
       "Hardware": "HRD",
       "Measuring Instruments": "MSR",
       "Power Tools": "PWR",
-      // Books & Education
       "Books & Education (General)": "BOK",
       "Educational Books": "EDU",
       "Novels & Literature": "NOV",
       "Religious Books": "REL",
       "Stationery": "STA",
       "School Supplies": "SCH",
-      // Sports & Fitness
       "Sports & Fitness (General)": "SPO",
       "Fitness Equipment": "FIT",
       "Gym Equipment": "GYM",
       "Water Bottles": "WAT",
-      // Baby, Kids & Toys
       "Baby, Kids & Toys (General)": "TOY",
       "Diapers & Wipes": "DIA",
       "Baby Food & Feeding": "BFD",
       "Strollers & Carriers": "STR",
       "Toys & Games": "PLY",
-      // Digital Products
-      "Digital Products": "DIG",
+      "Digital Products": "DIG"
     };
 
     // ===== Local storage helpers =====
@@ -292,16 +322,9 @@
     function saveVendors(map) { localStorage.setItem(LS_VENDORS, JSON.stringify(map)); }
 
     function normalizeCode(s) { return (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0,3); }
-
     function numberTo3(n) { return String(n).padStart(3, '0'); }
-
     function buildSku(cat, ven, num) { return `${cat}-${ven}-${numberTo3(num)}`; }
-    // Build the public product URL used in QR codes
     function productUrlFromSku(sku) { return `https://julinemart.com/p/${encodeURIComponent(String(sku||'').trim())}`; }
-
-    function findSku(cat, ven, num) {
-      return loadSkus().find(x => x.category_code===cat && x.vendor_code===ven && x.number===Number(num));
-    }
 
     function nextAvailable(cat, ven) {
       const used = new Set(loadSkus().filter(x => x.category_code===cat && x.vendor_code===ven).map(x => x.number));
@@ -316,6 +339,7 @@
     const vendorCode = document.getElementById('vendorCode');
     const productNumber = document.getElementById('productNumber');
     const productName = document.getElementById('productName');
+    const productUrl = document.getElementById('productUrl');
     const skuOut = document.getElementById('sku');
     const status = document.getElementById('status');
     const suggestBtn = document.getElementById('suggestBtn');
@@ -327,19 +351,127 @@
     const resetFilters = document.getElementById('resetFilters');
     const exportCsv = document.getElementById('exportCsv');
     const importCsv = document.getElementById('importCsv');
+    const exportMapBtn = document.getElementById('exportMap');
+    const importMapBtn = document.getElementById('importMap');
     const csvFile = document.getElementById('csvFile');
     const tableBody = document.getElementById('tableBody');
 
-    // Populate categories
-    function populateCategories() {
-      categorySel.innerHTML = '';
-      filterCategory.innerHTML = '<option value="">All</option>';
-      Object.keys(CATEGORY_MAP).forEach(name => {
-        const opt = document.createElement('option'); opt.value = name; opt.textContent = name; categorySel.appendChild(opt);
-        const fopt = document.createElement('option'); fopt.value = CATEGORY_MAP[name]; fopt.textContent = `${CATEGORY_MAP[name]} — ${name}`; filterCategory.appendChild(fopt);
-      });
-      categorySel.selectedIndex = 0;
-      categoryCode.value = CATEGORY_MAP[categorySel.value] || '';
+    // ===== Supabase helpers =====
+    const LS_SUPA = 'jm_supabase_cfg_v1';
+    function loadSupaCfg(){ try{return JSON.parse(localStorage.getItem(LS_SUPA)||'{}')}catch{ return {}; } }
+    function saveSupaCfg(cfg){ localStorage.setItem(LS_SUPA, JSON.stringify(cfg||{})); }
+    function getSupabase(){
+      const cfg = loadSupaCfg();
+      if (!cfg.url || !cfg.key || !window.supabase) return null;
+      if (!getSupabase._client || getSupabase._cachedKey!==cfg.key || getSupabase._cachedUrl!==cfg.url){
+        getSupabase._client = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: false } });
+        getSupabase._cachedKey = cfg.key; getSupabase._cachedUrl = cfg.url;
+      }
+      return getSupabase._client;
+    }
+    async function cloudUpsert(rec){
+      const sb = getSupabase(); if (!sb) return;
+      const { error } = await sb.from('skus').upsert({
+        sku: rec.sku,
+        category_code: rec.category_code,
+        category_name: rec.category_name,
+        vendor_code: rec.vendor_code,
+        vendor_name: rec.vendor_name,
+        number: rec.number,
+        product_name: rec.product_name,
+        product_url: rec.product_url,
+        created_at: rec.created_at,
+        updated_at: rec.updated_at,
+      }, { onConflict: 'sku' });
+      if (error) setStatus('Supabase upsert failed: '+error.message, 'bad');
+    }
+    async function cloudDelete(sku){ const sb=getSupabase(); if (!sb) return; const {error}=await sb.from('skus').delete().eq('sku', sku); if (error) setStatus('Supabase delete failed: '+error.message, 'bad'); }
+    async function cloudFetchAll(){ const sb=getSupabase(); if (!sb) throw new Error('Not connected'); const { data, error } = await sb.from('skus').select('*'); if (error) throw error; return data||[]; }
+
+    function downloadText(name, text, mime){ download(name, text, mime||'text/plain'); }
+
+    const SCHEMA_SQL = `-- JulineMart SKU schema (run in Supabase SQL editor)
+create table if not exists public.skus (
+  sku text primary key,
+  category_code text not null,
+  category_name text,
+  vendor_code text not null,
+  vendor_name text,
+  number int not null check (number between 1 and 999),
+  product_name text,
+  product_url text,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null
+);
+
+-- Enable Row Level Security
+alter table public.skus enable row level security;
+
+-- TEMP policies for MVP (anyone with anon key can read/write). Tighten later.
+create policy if not exists "skus read" on public.skus for select using (true);
+create policy if not exists "skus insert" on public.skus for insert with check (true);
+create policy if not exists "skus update" on public.skus for update using (true) with check (true);
+create policy if not exists "skus delete" on public.skus for delete using (true);
+
+-- Update trigger
+create or replace function public.touch_updated_at() returns trigger language plpgsql as $$
+begin new.updated_at = now(); return new; end; $$;
+create or replace trigger skus_touch_updated
+before update on public.skus
+for each row execute function public.touch_updated_at();`;
+
+    async function connectSupabase(){
+      const url = document.getElementById('sbUrl').value.trim();
+      const key = document.getElementById('sbKey').value.trim();
+      if (!url || !key){ setStatus('Enter SUPABASE_URL and SUPABASE_ANON_KEY', 'bad'); return; }
+      saveSupaCfg({url, key});
+      try{
+        const sb = getSupabase();
+        const { error } = await sb.from('skus').select('sku', { count: 'exact', head: true });
+        if (error && !/relation .* does not exist/i.test(error.message)) throw error;
+        if (error){ setStatus('Connected. Now open Supabase SQL editor and run downloaded schema.sql', 'ok'); }
+        else { setStatus('Connected to Supabase ✓', 'ok'); }
+      }catch(e){ setStatus('Supabase connect failed: '+e.message, 'bad'); }
+    }
+
+    async function pullFromCloud(){
+      try {
+        const cloud = await cloudFetchAll();
+        const local = loadSkus();
+        const bySku = Object.fromEntries(local.map(r=>[r.sku, r]));
+        let created=0, updated=0;
+        cloud.forEach(r=>{
+          const existing = bySku[r.sku];
+          if (!existing){ local.push(r); created++; }
+          else {
+            const lu = new Date(existing.updated_at||0).getTime();
+            const cu = new Date(r.updated_at||0).getTime();
+            if (cu > lu){ Object.assign(existing, r); updated++; }
+          }
+        });
+        saveSkus(local); renderTable(); setStatus(`Pulled from cloud: +${created} / updated ${updated}.`, 'ok');
+      } catch(e){ setStatus('Pull failed: '+e.message, 'bad'); }
+    }
+
+    async function pushToCloud(){
+      const list = loadSkus();
+      let ok=0, fail=0;
+      for (const r of list){ try{ await cloudUpsert(r); ok++; } catch{ fail++; } }
+      setStatus(`Pushed ${ok} records to cloud${fail?`, ${fail} failed`:''}.`, 'ok');
+    }
+
+    function enableLiveSync(){
+      const sb=getSupabase(); if (!sb){ setStatus('Connect first.', 'bad'); return; }
+      // Listen to local saves and push up; also subscribe to postgres changes to pull down.
+      if (!enableLiveSync._bound){
+        // local hook: monkey-patch saveSkus
+        const _save = saveSkus;
+        window.saveSkus = function(list){ _save(list); const last=list[list.length-1]; if (last) cloudUpsert(last); };
+        // realtime
+        sb.channel('skus-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'skus' }, (payload)=>{ pullFromCloud(); }).subscribe();
+        enableLiveSync._bound = true;
+      }
+      setStatus('Live sync enabled ✓', 'ok');
     }
 
     function refreshSkuField() {
@@ -347,22 +479,18 @@
       const ven = normalizeCode(vendorCode.value);
       const num = productNumber.value ? Number(productNumber.value) : '';
       vendorCode.value = ven;
-      if (cat && ven && num) skuOut.value = buildSku(cat, ven, num);
-      else skuOut.value = '';
+      if (cat && ven && num) skuOut.value = buildSku(cat, ven, num); else skuOut.value = '';
     }
 
     function autoSuggestVendorCode() {
       const name = vendorName.value.trim();
       const map = loadVendors();
       if (map[name]) { vendorCode.value = map[name]; return; }
-      // suggest from name: first 3 letters ignoring spaces/symbols
       const base = normalizeCode(name);
       if (!base) return;
       let code = base;
-      // ensure uniqueness among existing vendor codes if the same name appears with different code
       const existingCodes = new Set(Object.values(map));
       if (existingCodes.has(code)) {
-        // try variations: first/last letters, add X, etc.
         const alt = [base.slice(0,2)+"X", base.slice(0,1)+base.slice(-2), base.slice(0,1)+"Z"+base.slice(1,2)];
         for (const c of alt) { if (!existingCodes.has(c)) { code = c; break; } }
       }
@@ -389,6 +517,7 @@
           <td>${r.vendor_code}</td>
           <td>${numberTo3(r.number)}</td>
           <td>${(r.product_name||'').replace(/</g,'&lt;')}</td>
+          <td>${(r.product_url||'').replace(/</g,'&lt;')}</td>
           <td>${new Date(r.created_at).toLocaleString()}</td>
           <td><button data-edit="${r.sku}">Edit</button> <button data-label="${r.sku}">Label</button> <button class="danger" data-del="${r.sku}">Delete</button></td>
         </tr>
@@ -402,6 +531,7 @@
       vendorCode.value = rec.vendor_code;
       productNumber.value = rec.number;
       productName.value = rec.product_name || '';
+      productUrl.value = rec.product_url || '';
       refreshSkuField();
     }
 
@@ -420,6 +550,7 @@
       const ven = normalizeCode(vendorCode.value);
       const num = Number(productNumber.value);
       const pname = productName.value.trim();
+      const purl = productUrl.value.trim();
 
       if (!cat || ven.length!==3 || !num || num<1 || num>999) { setStatus('Please complete all required fields with valid values.', 'bad'); return; }
       const sku = buildSku(cat, ven, num);
@@ -428,15 +559,12 @@
       const now = new Date().toISOString();
 
       if (existing >= 0) {
-        // Update flow instead of duplicate
-        list[existing] = { ...list[existing], product_name: pname, vendor_name: vName, updated_at: now };
+        list[existing] = { ...list[existing], product_name: pname, vendor_name: vName, product_url: purl, updated_at: now };
         saveSkus(list);
-        // remember vendor code mapping
         if (vName) { const m = loadVendors(); m[vName] = ven; saveVendors(m); }
         setStatus(`Updated existing SKU <span class="kbd">${sku}</span>.`, 'ok');
       } else {
-        // Create new
-        const rec = { sku, category_code: cat, category_name: catName, vendor_code: ven, vendor_name: vName, number: num, product_name: pname, created_at: now, updated_at: now };
+        const rec = { sku, category_code: cat, category_name: catName, vendor_code: ven, vendor_name: vName, number: num, product_name: pname, product_url: purl, created_at: now, updated_at: now };
         list.push(rec); saveSkus(list);
         if (vName) { const m = loadVendors(); m[vName] = ven; saveVendors(m); }
         setStatus(`Saved new SKU <span class="kbd">${sku}</span>.`, 'ok');
@@ -446,26 +574,25 @@
     }
 
     function clearForm() {
-      vendorName.value = ''; vendorCode.value=''; productNumber.value=''; productName.value=''; skuOut.value=''; setStatus('');
+      vendorName.value = ''; vendorCode.value=''; productNumber.value=''; productName.value=''; productUrl.value=''; skuOut.value=''; setStatus('');
     }
 
     // Export CSV
     function toCsv(list) {
-      const head = ['sku','category_code','category_name','vendor_code','vendor_name','number','product_name','created_at','updated_at'];
+      const head = ['sku','category_code','category_name','vendor_code','vendor_name','number','product_name','product_url','created_at','updated_at'];
       const rows = list.map(r => head.map(k => (r[k] ?? '')).map(v => '"'+String(v).replace(/"/g,'""')+'"').join(','));
       return head.join(',') + '\n' + rows.join('\n');
     }
 
-    function download(filename, text) {
+    function download(filename, text, type='text/plain') {
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], {type: 'text/csv'}));
+      a.href = URL.createObjectURL(new Blob([text], {type}));
       a.download = filename; a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
     }
 
     // Import CSV
     function parseCsv(text) {
-      // very simple CSV parser for quoted values
       const lines = text.split(/\r?\n/).filter(Boolean);
       const head = lines.shift().split(',').map(s=>s.replace(/^\"|\"$/g,''));
       const out = [];
@@ -474,9 +601,8 @@
         let cur = ''; let inQ=false;
         for (let i=0;i<line.length;i++) {
           const ch = line[i];
-          if (ch==='"') {
-            if (inQ && line[i+1]==='"') { cur += '"'; i++; } else { inQ=!inQ; }
-          } else if (ch===',' && !inQ) { cells.push(cur); cur=''; } else { cur+=ch; }
+          if (ch==='"') { if (inQ && line[i+1]==='"') { cur += '"'; i++; } else { inQ=!inQ; } }
+          else if (ch===',' && !inQ) { cells.push(cur); cur=''; } else { cur+=ch; }
         }
         cells.push(cur);
         const obj = {}; head.forEach((h,idx)=> obj[h] = cells[idx]?.replace(/^\"|\"$/g,'') ?? '');
@@ -496,13 +622,40 @@
           const num = Number(numStr);
           if (!cat || !ven || !num || num<1 || num>999) { skipped++; continue; }
           const idx = list.findIndex(x => x.category_code===cat && x.vendor_code===ven && x.number===num);
-          const rec = { sku: r.sku, category_code: cat, category_name: r.category_name || '', vendor_code: ven, vendor_name: r.vendor_name||'', number: num, product_name: r.product_name||'', created_at: r.created_at||now, updated_at: now };
+          const rec = { sku: r.sku, category_code: cat, category_name: r.category_name || '', vendor_code: ven, vendor_name: r.vendor_name||'', number: num, product_name: r.product_name||'', product_url: r.product_url||'', created_at: r.created_at||now, updated_at: now };
           if (idx>=0) { list[idx] = { ...list[idx], ...rec }; updated++; }
           else { list.push(rec); created++; }
         } catch(e){ errors++; }
       }
       saveSkus(list); renderTable();
       setStatus(`Import done: created ${created}, updated ${updated}, skipped ${skipped}${errors?`, errors ${errors}`:''}.`, 'ok');
+    }
+
+    // Export / Import SKU → URL map
+    function exportSkuMap(){
+      const list = loadSkus();
+      const map = {};
+      list.forEach(r=>{ if (r.sku && r.product_url) map[r.sku.toUpperCase()] = r.product_url; });
+      download('sku-map.json', JSON.stringify(map, null, 2), 'application/json');
+      setStatus('Exported sku-map.json. Commit this file to your GitHub repo root.', 'ok');
+    }
+    function importSkuMapText(text){
+      try{
+        const map = JSON.parse(text);
+        if (!map || typeof map !== 'object') throw new Error('bad map');
+        const list = loadSkus();
+        const now = new Date().toISOString();
+        let updated = 0;
+        Object.keys(map).forEach(k=>{
+          const url = map[k];
+          const [cat, ven, numStr] = k.split('-');
+          const num = Number(numStr);
+          const idx = list.findIndex(x => x.category_code===cat && x.vendor_code===ven && x.number===num);
+          if (idx>=0){ if (!list[idx].product_url){ list[idx].product_url = url; list[idx].updated_at = now; updated++; } }
+        });
+        saveSkus(list); renderTable();
+        setStatus(`Imported sku-map.json and merged: updated ${updated} records.`, 'ok');
+      } catch(e){ setStatus('Failed to import sku-map.json', 'bad'); }
     }
 
     // Table actions (edit/delete/label)
@@ -522,6 +675,7 @@
         if (!confirm(`Delete ${delSku}?`)) return;
         const list = loadSkus().filter(x => x.sku!==delSku);
         saveSkus(list); renderTable(); setStatus(`Deleted ${delSku}.`, 'ok');
+        cloudDelete(delSku);
       }
     });
 
@@ -534,41 +688,38 @@
 
     suggestBtn.addEventListener('click', suggestNumber);
     saveBtn.addEventListener('click', saveRecord);
+    // Supabase UI events
+    const sbConnect = document.getElementById('sbConnect');
+    const sbPull = document.getElementById('sbPull');
+    const sbPush = document.getElementById('sbPush');
+    const sbLive = document.getElementById('sbLive');
+    const sbDownloadSql = document.getElementById('sbDownloadSql');
+    if (sbConnect) sbConnect.addEventListener('click', connectSupabase);
+    if (sbPull) sbPull.addEventListener('click', pullFromCloud);
+    if (sbPush) sbPush.addEventListener('click', pushToCloud);
+    if (sbLive) sbLive.addEventListener('click', enableLiveSync);
+    if (sbDownloadSql) sbDownloadSql.addEventListener('click', ()=> downloadText('schema.sql', SCHEMA_SQL, 'text/sql'));
     clearBtn.addEventListener('click', clearForm);
-
-    // Print current form label
-    document.getElementById('printBtn').addEventListener('click', ()=>{
-      const cat = categoryCode.value; const ven = normalizeCode(vendorCode.value); const num = Number(productNumber.value);
-      if (!cat || ven.length!==3 || !num || num<1 || num>999) { setStatus('Fill Category, Vendor Code, and a valid number (001–999) to print.', 'bad'); return; }
-      const rec = {
-        sku: buildSku(cat, ven, num),
-        category_code: cat,
-        category_name: categorySel.value,
-        vendor_code: ven,
-        vendor_name: vendorName.value.trim(),
-        number: num,
-        product_name: productName.value.trim(),
-      };
-      printLabel(rec);
-    });
 
     filterCategory.addEventListener('change', renderTable);
     filterVendor.addEventListener('input', renderTable);
     resetFilters.addEventListener('click', ()=>{ filterCategory.value=''; filterVendor.value=''; renderTable(); });
 
-    exportCsv.addEventListener('click', ()=>{
-      const list = loadSkus();
-      download('julinemart_skus.csv', toCsv(list));
-    });
-
+    exportCsv.addEventListener('click', ()=>{ download('julinemart_skus.csv', toCsv(loadSkus())); });
     importCsv.addEventListener('click', ()=> csvFile.click());
+    exportMapBtn.addEventListener('click', exportSkuMap);
+    importMapBtn.addEventListener('click', ()=> csvFile.click());
+
     csvFile.addEventListener('change', ()=>{
       const f = csvFile.files[0]; if (!f) return;
-      const reader = new FileReader(); reader.onload = ()=> importFromCsvText(reader.result); reader.readAsText(f);
-      csvFile.value = '';
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        if (f.name.endsWith('.json')) importSkuMapText(reader.result); else importFromCsvText(reader.result);
+      };
+      reader.readAsText(f); csvFile.value='';
     });
 
-    // ===== Logo handling =====
+    // ===== Branding (logo) =====
     const logoFile = document.getElementById('logoFile');
     function loadLogo() { return localStorage.getItem('jm_logo_dataurl') || ''; }
     function saveLogo(dataurl) { localStorage.setItem('jm_logo_dataurl', dataurl); }
@@ -579,10 +730,11 @@
       });
     }
 
+    // ===== Print label with QR (prefers product_url) =====
     function printLabel(rec){
       const logo = loadLogo();
       const sku = String(rec.sku || '').trim();
-      const url = productUrlFromSku(sku);
+      const url = (rec.product_url && rec.product_url.trim()) || productUrlFromSku(sku);
       const qr1 = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
       const qr2 = 'https://quickchart.io/qr?size=180&text=' + encodeURIComponent(url);
       const w = window.open('', '_blank', 'width=800,height=600');
@@ -612,54 +764,43 @@
           (function(){
             var img=document.getElementById('qr');
             var fb=document.getElementById('fallback');
-            var QR1 = ${JSON.stringify(qr1)};
-            var QR2 = ${JSON.stringify(qr2)};
+            var QR1 = ${JSON.stringify('')};
+            var QR2 = ${JSON.stringify('')};
+            // Inject strings safely to avoid escaping issues
+            QR1 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr1)} + ${JSON.stringify('').slice(1)};
+            QR2 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr2)} + ${JSON.stringify('').slice(1)};
             function done(){ setTimeout(function(){ window.print(); }, 300); }
-            img.onerror=function(){
-              if (img.src.indexOf('qrserver')!==-1){ img.src = QR2; }
-              else { img.remove(); fb.style.display='inline'; done(); }
-            };
-            img.onload=done;
-            img.src = QR1;
+            img.onerror=function(){ if (img.src.indexOf('qrserver')!==-1){ img.src = QR2; } else { img.remove(); fb.style.display='inline'; done(); } };
+            img.onload=done; img.src = QR1;
           })();
         <\/script>
       </body></html>`);
       w.document.close();
     }
 
-    // ===== Tiny self-tests (non-destructive) =====
+    // ===== Tiny self-tests =====
     (function runSelfTests(){
       const results = [];
-      function test(name, fn){
-        try { fn(); results.push({name, ok:true}); }
-        catch(e){ console.error('Test failed:', name, e); results.push({name, ok:false, err:e}); }
-      }
-      test('numberTo3 pads to 3 digits', ()=> { if (numberTo3(7) !== '007') throw new Error('pad'); });
-      test('numberTo3 upper bound', ()=> { if (numberTo3(999) !== '999') throw new Error('bound'); });
+      function test(name, fn){ try { fn(); results.push({name, ok:true}); } catch(e){ console.error('Test failed:', name, e); results.push({name, ok:false, err:e}); } }
+      test('numberTo3 pads', ()=> { if (numberTo3(7) !== '007') throw new Error('pad'); });
       test('buildSku format', ()=> { if (buildSku('WMN','QUE',7) !== 'WMN-QUE-007') throw new Error('format'); });
-      test('normalizeCode basic', ()=> { if (normalizeCode('que-1') !== 'QUE') throw new Error('norm'); });
-      // nextAvailable without harming user data
-      test('nextAvailable skips used numbers', ()=> {
-        const backup = loadSkus();
-        try {
-          saveSkus([{sku:'WMN-QUE-001', category_code:'WMN', vendor_code:'QUE', number:1, created_at:new Date().toISOString(), updated_at:new Date().toISOString()}]);
-          const n = nextAvailable('WMN','QUE');
-          if (n !== 2) throw new Error('expected 2, got '+n);
-        } finally { saveSkus(backup); }
-      });
-      test('productUrlFromSku builds correct URL', ()=> {
-        const u = productUrlFromSku('WMN-QUE-007');
-        if (u !== 'https://julinemart.com/p/WMN-QUE-007') throw new Error(u);
-      });
-      const pass = results.filter(r=>r.ok).length;
-      const el = document.getElementById('selfTest');
+      test('productUrlFromSku', ()=> { if (productUrlFromSku('WMN-QUE-007') !== 'https://julinemart.com/p/WMN-QUE-007') throw new Error('url'); });
+      test('route regex', ()=> { const re=/^\/p\/([A-Za-z]{3}-[A-Za-z]{3}-\d{3})$/; if (!re.test('/p/FAS-COL-001')||re.test('/p/fas-col-0001')) throw new Error('regex'); });
+      const pass = results.filter(r=>r.ok).length; const el = document.getElementById('selfTest');
       if (pass === results.length) { el.textContent = 'Self‑tests: all passed'; el.classList.add('ok'); }
       else { el.textContent = `Self‑tests: ${pass}/${results.length} passed`; el.classList.add('bad'); }
     })();
 
     // Init
-    populateCategories();
-    renderTable();
+    (function init(){
+      // Populate categories select controls
+      const catSel = document.getElementById('category');
+      const filtSel = document.getElementById('filterCategory');
+      catSel.innerHTML=''; filtSel.innerHTML='<option value="">All</option>';
+      Object.keys(CATEGORY_MAP).forEach(name=>{ const code=CATEGORY_MAP[name]; const o=document.createElement('option'); o.value=name; o.textContent=name; catSel.appendChild(o); const f=document.createElement('option'); f.value=code; f.textContent=code+' — '+name; filtSel.appendChild(f); });
+      document.getElementById('categoryCode').value=CATEGORY_MAP[catSel.value]||'';
+      renderTable();
+    })();
   </script>
 </body>
 </html>
