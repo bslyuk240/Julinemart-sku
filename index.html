@@ -20,9 +20,13 @@
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, #0b0f14, #0a0d12 60%, #0c1017); color: var(--text); }
     header { padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(11,15,20,0.8); backdrop-filter: blur(8px); z-index: 5; display:flex; align-items:center; gap:8px; }
     h1 { margin: 0; font-size: 20px; letter-spacing: 0.4px; }
-    .container { width: 100%; max-width: none; margin: 20px auto; padding: 0 20px 40px; }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 900px) { .grid { grid-template-columns: 1.5fr 1fr; } }
+    .container { width: 100%; max-width: 1280px; margin: 20px auto; padding: 0 24px 48px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1200px) { .grid { grid-template-columns: 1fr 220px 1.2fr; } }
+    .midcol { position: sticky; top: 76px; align-self: start; }
+    .vstack { display: flex; flex-direction: column; gap: 10px; }
+    .vstack button { width: 100%; } }
     @media (min-width: 1280px) { .grid { grid-template-columns: 2fr 1fr 1fr; } } }
     .card { background: linear-gradient(180deg, #121822, #0f1620); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
     .card h2 { margin: 0 0 12px 0; font-size: 18px; }
@@ -112,7 +116,12 @@
           <div></div>
         </div>
         <div id="status" class="note"></div>
-        <div class="actions">
+        <div class="actions" style="display:none"></div>
+      </div>
+
+      <div class="card midcol">
+        <h2>Actions</h2>
+        <div class="vstack">
           <button class="primary" id="suggestBtn">Suggest Number</button>
           <button class="success" id="saveBtn">Save SKU</button>
           <button id="printBtn">Print Label</button>
