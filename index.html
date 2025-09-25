@@ -18,44 +18,39 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, #0b0f14, #0a0d12 60%, #0c1017); color: var(--text); }
-    header { padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(11,15,20,0.8); backdrop-filter: blur(8px); z-index: 5; display:flex; align-items:center; gap:8px; }
-    h1 { margin: 0; font-size: 20px; letter-spacing: 0.4px; }
-    .container { width: 100%; max-width: 1280px; margin: 20px auto; padding: 0 24px 48px; }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
-    @media (min-width: 1200px) { .grid { grid-template-columns: 1fr 220px 1.2fr; } }
-    .midcol { position: sticky; top: 76px; align-self: start; }
-    .vstack { display: flex; flex-direction: column; gap: 10px; }
-    .vstack button { width: 100%; } }
-    @media (min-width: 1280px) { .grid { grid-template-columns: 2fr 1fr 1fr; } } }
+    header { padding: 16px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(11,15,20,0.8); backdrop-filter: blur(8px); z-index: 5; display:flex; align-items:center; gap:12px; }
+    h1 { margin: 0; font-size: 18px; letter-spacing: 0.4px; }
+    .container { width: 100%; max-width: 1200px; margin: 20px auto; padding: 0 20px 40px; }
     .card { background: linear-gradient(180deg, #121822, #0f1620); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
     .card h2 { margin: 0 0 12px 0; font-size: 18px; }
     label { display: block; margin: 10px 0 6px; color: var(--muted); font-size: 13px; }
-    select, input[type=text], input[type=number], input[type=url] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); outline: none; }
+    select, input[type=text], input[type=number] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); outline: none; }
     input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,44,172,0.25); }
     .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    @media (min-width: 800px) { .row-2 { grid-template-columns: 1fr 1fr; } .row-3 { grid-template-columns: 1fr 1fr 1fr; } }
+    .row-2 { grid-template-columns: 1fr; }
+    .row-3 { grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .row-2 { grid-template-columns: 1fr 1fr; } .row-3 { grid-template-columns: 1fr 1fr 1fr; } }
     .muted { color: var(--muted); font-size: 12px; }
+    .pill { display:inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; border:1px solid var(--border); background:#0b111a; color:var(--muted); }
+    .pill.ok { color:#0b0f14; background:#22c55e; border-color:#16a34a; }
+    .pill.bad { color:#0b0f14; background:#ef4444; border-color:#b91c1c; }
+    .pill.active { background: var(--accent-2); color:#0b0f14; border-color:#cc7e09; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
     button { padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b111a; color: var(--text); cursor: pointer; }
     .primary { background: var(--accent); border-color: #3e2492; }
-    .success { background: var(--accent-2); border-color: #e67627; color: #0b0f14; }
+    .success { background: var(--accent-2); border-color: #cc7e09; color: #0b0f14; }
     .warn { background: var(--warn); border-color: #cc7e09; color: #0b0f14; }
-    .danger { background: var(--danger); border-color: #c03535; }
-    .pill { display:inline-block; padding: 4px 8px; border-radius: 999px; font-size: 11px; border:1px solid var(--border); background:#0b111a; color:var(--muted) }
+    .danger { background: var(--danger); border-color: #b91c1c; }
     .list { margin-top: 10px; max-height: 520px; overflow:auto; border-radius: 12px; border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    th { position: sticky; top: 0; background: #101723; text-align: left; font-weight: 600; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align:left; }
+    th { position: sticky; top: 0; background: #101723; font-weight: 600; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background: #0b111a; border:1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
     .sku { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .ok { color: #8cf0c6; }
-    .bad { color: var(--danger); }
     .note { margin-top: 6px; font-size: 12px; }
-    .footer { margin-top: 24px; color: var(--muted); font-size: 12px; }
+    nav { margin-left:auto; display:flex; gap:8px; align-items:center }
   </style>
-  <!-- Supabase client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Hardcoded Supabase credentials (as requested). For production, prefer env vars + stricter RLS.
@@ -65,103 +60,102 @@
 </head>
 <body>
   <header>
-    <h1>JulineMart SKU Generator <span class="pill">MVP • Cloud‑sync</span></h1>
-    <nav style="margin-left:auto; display:flex; gap:8px; align-items:center">
-      <button id="navCreate" class="pill" style="cursor:pointer">Create</button>
-      <button id="navSearch" class="pill" style="cursor:pointer">Search</button>
-      <span id="sbStatus" class="pill" title="Supabase connection status">Connecting…</span>
+    <h1>JulineMart SKU Generator</h1>
+    <nav>
+      <button id="navCreate" class="pill">Create</button>
+      <button id="navSearch" class="pill">Search</button>
+      <span id="sbStatus" class="pill">Connecting…</span>
+      <span id="selfTest" class="pill">Running tests…</span>
     </nav>
   </header>
+
   <div class="container">
     <!-- PAGE: CREATE -->
     <section id="page-create">
-      <div class="grid" style="grid-template-columns: 1fr; gap:20px">
-        <div class="card">
-          <h2>Create / Update SKU</h2>
-          <div class="row row-2">
-            <div>
-              <label>Category</label>
-              <select id="category"></select>
-            </div>
-            <div>
-              <label>Category Code</label>
-              <input type="text" id="categoryCode" readonly />
-            </div>
+      <div class="card">
+        <h2>Create / Update SKU</h2>
+        <div class="row row-2">
+          <div>
+            <label>Category</label>
+            <select id="category"></select>
           </div>
-          <div class="row row-2">
-            <div>
-              <label>Vendor Name</label>
-              <input type="text" id="vendorName" placeholder="e.g., Queen Styles" />
-            </div>
-            <div>
-              <label>Vendor Code (3 letters)</label>
-              <input type="text" id="vendorCode" placeholder="e.g., QUE" maxlength="3" />
-            </div>
+          <div>
+            <label>Category Code</label>
+            <input type="text" id="categoryCode" readonly />
           </div>
-          <div class="row row-3">
-            <div>
-              <label>Product Number (001–999)</label>
-              <input type="number" id="productNumber" min="1" max="999" />
-              <div class="note muted">Auto-suggests next available on Category+Vendor</div>
-            </div>
-            <div>
-              <label>Product Name (optional)</label>
-              <input type="text" id="productName" placeholder="e.g., Ankara Maxi Dress" />
-            </div>
-            <div>
-              <label>SKU</label>
-              <input type="text" id="sku" class="sku" readonly />
-            </div>
+        </div>
+        <div class="row row-2">
+          <div>
+            <label>Vendor Name</label>
+            <input type="text" id="vendorName" placeholder="e.g., Queen Styles" />
           </div>
-          <div class="row">
-            <div>
-              <label>Product URL (optional — used for public redirect)</label>
-              <input type="text" id="productUrl" placeholder="https://julinemart.com/product/..."/>
-              <div class="note muted">If provided, QR will point directly to this URL. If empty, QR uses <span class="kbd">/p/&lt;SKU&gt;</span> which looks up the URL in cloud.</div>
-            </div>
+          <div>
+            <label>Vendor Code (3 letters)</label>
+            <input type="text" id="vendorCode" placeholder="e.g., QUE" maxlength="3" />
           </div>
+        </div>
+        <div class="row row-3">
+          <div>
+            <label>Product Number (001–999)</label>
+            <input type="number" id="productNumber" min="1" max="999" />
+            <div class="note muted">Auto-suggests next available on Category+Vendor</div>
+          </div>
+          <div>
+            <label>Product Name (optional)</label>
+            <input type="text" id="productName" placeholder="e.g., Ankara Maxi Dress" />
+          </div>
+          <div>
+            <label>SKU</label>
+            <input type="text" id="sku" class="sku" readonly />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Product URL (optional — used for public redirect)</label>
+            <input type="text" id="productUrl" placeholder="https://julinemart.com/product/..."/>
+            <div class="note muted">If provided, QR will point directly to this URL. If empty, QR uses <span class="kbd">/p/&lt;SKU&gt;</span> which looks up the URL in cloud.</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="suggestBtn">Suggest Number</button>
+          <button class="success" id="saveBtn">Save SKU</button>
+          <button id="printBtn">Print Label</button>
+          <button id="clearBtn">Clear</button>
+        </div>
+        <div id="status" class="note"></div>
+      </div>
 
-          <div class="actions" style="display:flex; gap:10px; margin-top:16px">
-            <button class="primary" id="suggestBtn">Suggest Number</button>
-            <button class="success" id="saveBtn">Save SKU</button>
-            <button id="printBtn">Print Label</button>
-            <button id="clearBtn">Clear</button>
-          </div>
-          <div id="status" class="note"></div>
-        </div>
-        <div class="card">
-          <h2>Branding</h2>
-          <label>Upload Logo (PNG/SVG)</label>
-          <input type="file" id="logoFile" accept="image/*">
-          <div class="note muted">Your logo will be printed on labels and saved to this browser only.</div>
-        </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Branding</h2>
+        <label>Upload Logo (PNG/SVG)</label>
+        <input type="file" id="logoFile" accept="image/*">
+        <div class="note muted">Your logo will be printed on labels and saved to this browser only.</div>
       </div>
     </section>
 
     <!-- PAGE: SEARCH -->
     <section id="page-search" style="display:none">
-      <div class="grid" style="grid-template-columns: 1fr; gap:20px">
-        <div class="card">
-          <h2>Search / Export</h2>
-          <div class="row row-2">
-            <div>
-              <label>Filter by Category</label>
-              <select id="filterCategory"></select>
-            </div>
-            <div>
-              <label>Filter by Vendor Code</label>
-              <input type="text" id="filterVendor" placeholder="e.g., QUE" maxlength="3" />
-            </div>
+      <div class="card">
+        <h2>Search / Export</h2>
+        <div class="row row-2">
+          <div>
+            <label>Filter by Category</label>
+            <select id="filterCategory"></select>
           </div>
-          <div class="actions">
-            <button id="resetFilters">Reset</button>
-            <button id="exportCsv">Export CSV</button>
-            <button class="warn" id="importCsv">Import CSV</button>
-            <input type="file" id="csvFile" accept=".csv" style="display:none" />
+          <div>
+            <label>Filter by Vendor Code</label>
+            <input type="text" id="filterVendor" placeholder="e.g., QUE" maxlength="3" />
           </div>
-          <div class="list">
-            <table>
-              <thead>
+        </div>
+        <div class="actions">
+          <button id="resetFilters">Reset</button>
+          <button id="exportCsv">Export CSV</button>
+          <button class="warn" id="importCsv">Import CSV</button>
+          <input type="file" id="csvFile" accept=".csv" style="display:none" />
+        </div>
+        <div class="list">
+          <table>
+            <thead>
               <tr>
                 <th>SKU</th>
                 <th>Category</th>
@@ -174,10 +168,9 @@
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
-            </table>
-          </div>
-          <div class="footer">Storage: Local (browser) + Supabase cloud sync. Export CSV for backup.</div>
+          </table>
         </div>
+        <div class="footer">Storage: Local (browser) + Supabase cloud sync. Export CSV for backup.</div>
       </div>
     </section>
   </div>
@@ -185,54 +178,9 @@
   <div id="printArea" style="display:none"></div>
 
   <script>
-    // ===== Public route handler: /p/<SKU> redirects via Supabase if available =====
-    (function handlePublicRoute(){
-      try {
-        var path = String(location.pathname || '');
-        while (path.length > 1 && path.endsWith('/')) { path = path.slice(0, -1); }
-        var re = new RegExp('^/p/([A-Za-z]{3}-[A-Za-z]{3}-\d{3})$','i');
-        var m = path.match(re);
-        if (!m) return; // not a public product route
-        var sku = m[1].toUpperCase();
-        var css = document.createElement('style');
-        css.textContent = '.overlay{position:fixed;inset:0;background:#0b0f14;color:#e8eefc;display:flex;align-items:center;justify-content:center;padding:24px}'+
-                          '.box{max-width:680px;width:100%;background:linear-gradient(180deg,#121822,#0f1620);border:1px solid #1f2937;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}'+
-                          '.row{margin:8px 0}.sku{font-family:ui-monospace,Consolas,monospace;font-size:18px;font-weight:700}'+
-                          '.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}'+
-                          '.btn{padding:10px 14px;border-radius:10px;border:1px solid #1f2937;background:#0b111a;color:#e8eefc;cursor:pointer}'+
-                          '.accent{background:#4f2cac;border-color:#3e2492}';
-        document.head.appendChild(css);
-        var wrap = document.createElement('div');
-        wrap.className = 'overlay';
-        wrap.innerHTML = '<div class="box">'+
-          '<div class="row">Opening product…</div>'+
-          '<div class="row sku" id="ovSku">'+sku+'</div>'+
-          '<div class="row" id="ovMsg">Checking cloud mapping…</div>'+
-          '<div class="btns">'+
-            '<button class="btn accent" id="ovCopy">Copy SKU</button>'+
-            '<a class="btn" id="ovHome" href="https://julinemart.com" target="_self">Go to JulineMart</a>'+
-          '</div>'+
-        '</div>';
-        document.body.innerHTML = ''; document.body.appendChild(wrap);
-        var msg = document.getElementById('ovMsg');
-        var copyBtn = document.getElementById('ovCopy');
-        copyBtn.onclick = function(){ if (navigator.clipboard) { navigator.clipboard.writeText(sku).then(function(){ msg.textContent = 'Copied '+sku+' ✅'; }).catch(function(){ msg.textContent='Copy failed — use long‑press to copy.'; }); } };
-        // === Supabase query ===
-        var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:false} });
-        sb.from('skus').select('product_url').eq('sku', sku).maybeSingle().then(function(res){
-          if (res.error){ msg.textContent = 'Error fetching from Supabase: '+res.error.message; return; }
-          if (res.data && res.data.product_url){
-            msg.textContent = 'Redirecting to product page…';
-            location.replace(res.data.product_url);
-          } else {
-            msg.textContent = 'No product page linked to this SKU yet.';
-          }
-        });
-      } catch(e) { /* ignore */ }
-    })();
-
     // ===== Category Map (from your list) =====
     const CATEGORY_MAP = {
+      // Fashion & Accessories
       "Fashion & Accessories": "FAS",
       "Bags": "BAG",
       "Caps & Hats": "HAT",
@@ -244,12 +192,14 @@
       "Women’s Clothing": "WMN",
       "Footwear": "FTW",
       "Traditional Wear": "TRD",
+      // Automotive
       "Automotive (General)": "AUT",
       "Engine Oil & Fluids": "OIL",
       "Car Accessories": "CAR",
       "Car Electronics": "CEL",
       "Tyres & Batteries": "TYR",
       "Motorcycle Parts": "MOT",
+      // Electronics
       "Electronics (General)": "ELE",
       "Gaming Consoles": "GAM",
       "Accessories (Chargers, Cables, Earphones)": "ACC",
@@ -259,12 +209,14 @@
       "Tablets": "TAB",
       "Televisions": "TVS",
       "Wearable Tech (Smartwatches)": "SMT",
+      // Home & Living
       "Home & Living (General)": "HOM",
       "Bathroom Accessories": "BTH",
       "Bedding & Linen": "BED",
       "Furniture": "FUR",
       "Home Décor": "DEC",
       "Kitchen Appliances": "KIT",
+      // Grocery & Foodstuff
       "Grocery & Foodstuff (General)": "GRC",
       "Drinks & Beverages": "DRK",
       "Grains & Cereals": "GRN",
@@ -272,6 +224,7 @@
       "Packaged Food": "PKG",
       "Snacks": "SNK",
       "Spices & Seasoning": "SPC",
+      // Beauty & Personal Care
       "Beauty & Personal Care (General)": "BEA",
       "Grooming Tools": "GRM",
       "Haircare": "HAI",
@@ -280,28 +233,33 @@
       "Lighting": "LGT",
       "Sanitary Products": "SAN",
       "Skincare": "SKN",
+      // Tools & Industrial
       "Tools & Industrial (General)": "TOL",
       "Building Materials": "BLD",
       "Electrical Tools": "ELC",
       "Hardware": "HRD",
       "Measuring Instruments": "MSR",
       "Power Tools": "PWR",
+      // Books & Education
       "Books & Education (General)": "BOK",
       "Educational Books": "EDU",
       "Novels & Literature": "NOV",
       "Religious Books": "REL",
       "Stationery": "STA",
       "School Supplies": "SCH",
+      // Sports & Fitness
       "Sports & Fitness (General)": "SPO",
       "Fitness Equipment": "FIT",
       "Gym Equipment": "GYM",
       "Water Bottles": "WAT",
+      // Baby, Kids & Toys
       "Baby, Kids & Toys (General)": "TOY",
       "Diapers & Wipes": "DIA",
       "Baby Food & Feeding": "BFD",
       "Strollers & Carriers": "STR",
       "Toys & Games": "PLY",
-      "Digital Products": "DIG"
+      // Digital Products
+      "Digital Products": "DIG",
     };
 
     // ===== Local storage helpers =====
@@ -315,39 +273,19 @@
     function saveVendors(map) { localStorage.setItem(LS_VENDORS, JSON.stringify(map)); }
 
     function normalizeCode(s) { return (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0,3); }
+
     function numberTo3(n) { return String(n).padStart(3, '0'); }
+
     function buildSku(cat, ven, num) { return `${cat}-${ven}-${numberTo3(num)}`; }
     function productUrlFromSku(sku) { return `https://julinemart.com/p/${encodeURIComponent(String(sku||'').trim())}`; }
+
+    function findSku(cat, ven, num) { return loadSkus().find(x => x.category_code===cat && x.vendor_code===ven && x.number===Number(num)); }
 
     function nextAvailable(cat, ven) {
       const used = new Set(loadSkus().filter(x => x.category_code===cat && x.vendor_code===ven).map(x => x.number));
       for (let i=1;i<=999;i++) { if (!used.has(i)) return i; }
-      return null; // full
+      return null;
     }
-
-    // ===== UI elements =====
-    const categorySel = document.getElementById('category');
-    const categoryCode = document.getElementById('categoryCode');
-    const vendorName = document.getElementById('vendorName');
-    const vendorCode = document.getElementById('vendorCode');
-    const productNumber = document.getElementById('productNumber');
-    const productName = document.getElementById('productName');
-    const productUrl = document.getElementById('productUrl');
-    const skuOut = document.getElementById('sku');
-    const status = document.getElementById('status');
-    const suggestBtn = document.getElementById('suggestBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const clearBtn = document.getElementById('clearBtn');
-
-    const filterCategory = document.getElementById('filterCategory');
-    const filterVendor = document.getElementById('filterVendor');
-    const resetFilters = document.getElementById('resetFilters');
-    const exportCsv = document.getElementById('exportCsv');
-    const importCsv = document.getElementById('importCsv');
-    const exportMapBtn = document.getElementById('exportMap');
-    const importMapBtn = document.getElementById('importMap');
-    const csvFile = document.getElementById('csvFile');
-    const tableBody = document.getElementById('tableBody');
 
     // ===== Supabase helpers =====
     function getSupabase(){
@@ -357,22 +295,26 @@
       }
       return getSupabase._client;
     }
+
     async function cloudUpsert(rec){
-      const sb = getSupabase(); if (!sb) return;
-      const { error } = await sb.from('skus').upsert({
-        sku: rec.sku,
-        category_code: rec.category_code,
-        category_name: rec.category_name,
-        vendor_code: rec.vendor_code,
-        vendor_name: rec.vendor_name,
-        number: rec.number,
-        product_name: rec.product_name,
-        product_url: rec.product_url,
-        created_at: rec.created_at,
-        updated_at: rec.updated_at,
-      }, { onConflict: 'sku' });
-      if (error) setStatus('Supabase upsert failed: '+error.message, 'bad');
+      try{
+        const sb = getSupabase(); if (!sb) return;
+        const { error } = await sb.from('skus').upsert({
+          sku: rec.sku,
+          category_code: rec.category_code,
+          category_name: rec.category_name,
+          vendor_code: rec.vendor_code,
+          vendor_name: rec.vendor_name,
+          number: rec.number,
+          product_name: rec.product_name,
+          product_url: rec.product_url,
+          created_at: rec.created_at,
+          updated_at: rec.updated_at,
+        }, { onConflict: 'sku' });
+        if (error) setStatus('Supabase upsert failed: '+error.message, 'bad');
+      }catch(e){ setStatus('Supabase error: '+e.message, 'bad'); }
     }
+
     async function cloudDelete(sku){ const sb=getSupabase(); if (!sb) return; const {error}=await sb.from('skus').delete().eq('sku', sku); if (error) setStatus('Supabase delete failed: '+error.message, 'bad'); }
     async function cloudFetchAll(){ const sb=getSupabase(); if (!sb) throw new Error('Not connected'); const { data, error } = await sb.from('skus').select('*'); if (error) throw error; return data||[]; }
 
@@ -392,18 +334,70 @@
           }
         });
         saveSkus(local); renderTable(); setStatus(`Pulled from cloud: +${created} / updated ${updated}.`, 'ok');
-      } catch(e){ setStatus('Pull failed: '+e.message, 'bad'); }
+        setSbBadge(true,'Supabase ✓');
+      } catch(e){ setStatus('Pull failed: '+e.message, 'bad'); setSbBadge(false,'Supabase not available'); }
     }
 
     function enableLiveSync(){
-      const sb=getSupabase(); if (!sb){ setStatus('Supabase not available.', 'bad'); return; }
+      const sb=getSupabase(); if (!sb){ setSbBadge(false,'Supabase not available'); return; }
       if (!enableLiveSync._bound){
         const _save = saveSkus;
         window.saveSkus = function(list){ _save(list); const last=list[list.length-1]; if (last) cloudUpsert(last); };
         sb.channel('skus-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'skus' }, ()=>{ pullFromCloud(); }).subscribe();
         enableLiveSync._bound = true;
       }
-      setStatus('Live sync enabled ✓', 'ok');
+    }
+
+    // ===== UI elements =====
+    const categorySel = document.getElementById('category');
+    const categoryCode = document.getElementById('categoryCode');
+    const vendorName = document.getElementById('vendorName');
+    const vendorCode = document.getElementById('vendorCode');
+    const productNumber = document.getElementById('productNumber');
+    const productName = document.getElementById('productName');
+    const productUrl = document.getElementById('productUrl');
+    const skuOut = document.getElementById('sku');
+    const status = document.getElementById('status');
+
+    const suggestBtn = document.getElementById('suggestBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const printBtn = document.getElementById('printBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const filterCategory = document.getElementById('filterCategory');
+    const filterVendor = document.getElementById('filterVendor');
+    const resetFilters = document.getElementById('resetFilters');
+    const exportCsv = document.getElementById('exportCsv');
+    const importCsv = document.getElementById('importCsv');
+    const csvFile = document.getElementById('csvFile');
+    const tableBody = document.getElementById('tableBody');
+
+    // Page nav
+    const pageCreate = document.getElementById('page-create');
+    const pageSearch = document.getElementById('page-search');
+    const navCreate  = document.getElementById('navCreate');
+    const navSearch  = document.getElementById('navSearch');
+    const sbStatus   = document.getElementById('sbStatus');
+
+    function setSbBadge(ok, msg){ if (!sbStatus) return; sbStatus.textContent = msg || (ok ? 'Supabase ✓' : 'Supabase not available'); sbStatus.className = 'pill ' + (ok ? 'ok' : 'bad'); }
+
+    function setStatus(msg, kind=''){ status.innerHTML = msg; status.className = 'note ' + (kind==='ok' ? 'ok' : kind==='bad' ? 'bad' : ''); }
+
+    function showPage(which){ pageCreate.style.display = which==='create'?'block':'none'; pageSearch.style.display = which==='search'?'block':'none'; navCreate.classList.toggle('active', which==='create'); navSearch.classList.toggle('active', which==='search'); if (which==='search') renderTable(); }
+
+    if (navCreate) navCreate.addEventListener('click', ()=> showPage('create'));
+    if (navSearch) navSearch.addEventListener('click', ()=> showPage('search'));
+
+    function populateCategories() {
+      categorySel.innerHTML = '';
+      filterCategory.innerHTML = '<option value="">All</option>';
+      Object.keys(CATEGORY_MAP).forEach(name => {
+        const code = CATEGORY_MAP[name];
+        const opt = document.createElement('option'); opt.value = name; opt.textContent = name; categorySel.appendChild(opt);
+        const fopt = document.createElement('option'); fopt.value = code; fopt.textContent = `${code} — ${name}`; filterCategory.appendChild(fopt);
+      });
+      categorySel.selectedIndex = 0;
+      categoryCode.value = CATEGORY_MAP[categorySel.value] || '';
     }
 
     function refreshSkuField() {
@@ -429,11 +423,6 @@
       vendorCode.value = code.padEnd(3,'X').slice(0,3);
     }
 
-    function setStatus(msg, kind='') {
-      status.innerHTML = msg;
-      status.className = 'note ' + (kind==='ok' ? 'ok' : kind==='bad' ? 'bad' : '');
-    }
-
     function renderTable() {
       const list = loadSkus();
       const fc = filterCategory.value.trim();
@@ -441,19 +430,21 @@
       const rows = list
         .filter(r => (!fc || r.category_code===fc) && (!fv || r.vendor_code===fv))
         .sort((a,b)=> a.sku.localeCompare(b.sku));
-
-      tableBody.innerHTML = rows.map(r => `
-        <tr>
-          <td class="sku">${r.sku}</td>
-          <td>${r.category_code}</td>
-          <td>${r.vendor_code}</td>
-          <td>${numberTo3(r.number)}</td>
-          <td>${(r.product_name||'').replace(/</g,'&lt;')}</td>
-          <td>${(r.product_url||'').replace(/</g,'&lt;')}</td>
-          <td>${new Date(r.created_at).toLocaleString()}</td>
-          <td><button data-edit="${r.sku}">Edit</button> <button data-label="${r.sku}">Label</button> <button class="danger" data-del="${r.sku}">Delete</button></td>
-        </tr>
-      `).join('');
+      tableBody.innerHTML = rows.map(r => {
+        const pname = (r.product_name||'').replace(/</g,'&lt;');
+        const url = r.product_url ? `<a href="${r.product_url}" target="_blank">link</a>` : '';
+        return `
+          <tr>
+            <td class="sku">${r.sku}</td>
+            <td>${r.category_code}</td>
+            <td>${r.vendor_code}</td>
+            <td>${numberTo3(r.number)}</td>
+            <td>${pname}</td>
+            <td>${url}</td>
+            <td>${new Date(r.created_at).toLocaleString()}</td>
+            <td><button data-edit="${r.sku}">Edit</button> <button data-label="${r.sku}">Label</button> <button class="danger" data-del="${r.sku}">Delete</button></td>
+          </tr>`;
+      }).join('');
     }
 
     function fillFormFromSku(rec) {
@@ -465,6 +456,7 @@
       productName.value = rec.product_name || '';
       productUrl.value = rec.product_url || '';
       refreshSkuField();
+      showPage('create');
     }
 
     function suggestNumber() {
@@ -495,19 +487,18 @@
         saveSkus(list);
         if (vName) { const m = loadVendors(); m[vName] = ven; saveVendors(m); }
         setStatus(`Updated existing SKU <span class="kbd">${sku}</span>.`, 'ok');
+        cloudUpsert(list[existing]);
       } else {
         const rec = { sku, category_code: cat, category_name: catName, vendor_code: ven, vendor_name: vName, number: num, product_name: pname, product_url: purl, created_at: now, updated_at: now };
         list.push(rec); saveSkus(list);
         if (vName) { const m = loadVendors(); m[vName] = ven; saveVendors(m); }
         setStatus(`Saved new SKU <span class="kbd">${sku}</span>.`, 'ok');
+        cloudUpsert(rec);
       }
-      renderTable();
-      refreshSkuField();
+      renderTable(); refreshSkuField();
     }
 
-    function clearForm() {
-      vendorName.value = ''; vendorCode.value=''; productNumber.value=''; productName.value=''; productUrl.value=''; skuOut.value=''; setStatus('');
-    }
+    function clearForm() { vendorName.value = ''; vendorCode.value=''; productNumber.value=''; productName.value=''; productUrl.value=''; skuOut.value=''; setStatus(''); }
 
     // Export CSV
     function toCsv(list) {
@@ -516,12 +507,7 @@
       return head.join(',') + '\n' + rows.join('\n');
     }
 
-    function download(filename, text, type='text/plain') {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], {type}));
-      a.download = filename; a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-    }
+    function download(filename, text, mime){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:mime||'text/csv'})); a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); }
 
     // Import CSV
     function parseCsv(text) {
@@ -529,13 +515,8 @@
       const head = lines.shift().split(',').map(s=>s.replace(/^\"|\"$/g,''));
       const out = [];
       for (const line of lines) {
-        const cells = [];
-        let cur = ''; let inQ=false;
-        for (let i=0;i<line.length;i++) {
-          const ch = line[i];
-          if (ch==='"') { if (inQ && line[i+1]==='"') { cur += '"'; i++; } else { inQ=!inQ; } }
-          else if (ch===',' && !inQ) { cells.push(cur); cur=''; } else { cur+=ch; }
-        }
+        const cells = []; let cur = ''; let inQ=false;
+        for (let i=0;i<line.length;i++) { const ch=line[i]; if (ch==='"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else { inQ=!inQ; } } else if (ch===',' && !inQ) { cells.push(cur); cur=''; } else { cur+=ch; } }
         cells.push(cur);
         const obj = {}; head.forEach((h,idx)=> obj[h] = cells[idx]?.replace(/^\"|\"$/g,'') ?? '');
         if (obj.sku) out.push(obj);
@@ -555,39 +536,11 @@
           if (!cat || !ven || !num || num<1 || num>999) { skipped++; continue; }
           const idx = list.findIndex(x => x.category_code===cat && x.vendor_code===ven && x.number===num);
           const rec = { sku: r.sku, category_code: cat, category_name: r.category_name || '', vendor_code: ven, vendor_name: r.vendor_name||'', number: num, product_name: r.product_name||'', product_url: r.product_url||'', created_at: r.created_at||now, updated_at: now };
-          if (idx>=0) { list[idx] = { ...list[idx], ...rec }; updated++; }
-          else { list.push(rec); created++; }
+          if (idx>=0) { list[idx] = { ...list[idx], ...rec }; updated++; cloudUpsert(list[idx]); }
+          else { list.push(rec); created++; cloudUpsert(rec); }
         } catch(e){ errors++; }
       }
-      saveSkus(list); renderTable();
-      setStatus(`Import done: created ${created}, updated ${updated}, skipped ${skipped}${errors?`, errors ${errors}`:''}.`, 'ok');
-    }
-
-    // Export / Import SKU → URL map
-    function exportSkuMap(){
-      const list = loadSkus();
-      const map = {};
-      list.forEach(r=>{ if (r.sku && r.product_url) map[r.sku.toUpperCase()] = r.product_url; });
-      download('sku-map.json', JSON.stringify(map, null, 2), 'application/json');
-      setStatus('Exported sku-map.json. Commit this file to your GitHub repo root.', 'ok');
-    }
-    function importSkuMapText(text){
-      try{
-        const map = JSON.parse(text);
-        if (!map || typeof map !== 'object') throw new Error('bad map');
-        const list = loadSkus();
-        const now = new Date().toISOString();
-        let updated = 0;
-        Object.keys(map).forEach(k=>{
-          const url = map[k];
-          const [cat, ven, numStr] = k.split('-');
-          const num = Number(numStr);
-          const idx = list.findIndex(x => x.category_code===cat && x.vendor_code===ven && x.number===num);
-          if (idx>=0){ if (!list[idx].product_url){ list[idx].product_url = url; list[idx].updated_at = now; updated++; } }
-        });
-        saveSkus(list); renderTable();
-        setStatus(`Imported sku-map.json and merged: updated ${updated} records.`, 'ok');
-      } catch(e){ setStatus('Failed to import sku-map.json', 'bad'); }
+      saveSkus(list); renderTable(); setStatus(`Import done: created ${created}, updated ${updated}, skipped ${skipped}${errors?`, errors ${errors}`:''}.`, 'ok');
     }
 
     // Table actions (edit/delete/label)
@@ -595,68 +548,49 @@
       const editSku = e.target.getAttribute('data-edit');
       const delSku = e.target.getAttribute('data-del');
       const labelSku = e.target.getAttribute('data-label');
-      if (editSku) {
-        const rec = loadSkus().find(x => x.sku===editSku);
-        if (rec) fillFormFromSku(rec);
-      }
-      if (labelSku) {
-        const rec = loadSkus().find(x => x.sku===labelSku);
-        if (rec) printLabel(rec);
-      }
-      if (delSku) {
-        if (!confirm(`Delete ${delSku}?`)) return;
-        const list = loadSkus().filter(x => x.sku!==delSku);
-        saveSkus(list); renderTable(); setStatus(`Deleted ${delSku}.`, 'ok');
-        cloudDelete(delSku);
-      }
+      if (editSku) { const rec = loadSkus().find(x => x.sku===editSku); if (rec) fillFormFromSku(rec); }
+      if (labelSku) { const rec = loadSkus().find(x => x.sku===labelSku); if (rec) printLabel(rec); }
+      if (delSku) { if (!confirm(`Delete ${delSku}?`)) return; const list = loadSkus().filter(x => x.sku!==delSku); saveSkus(list); renderTable(); setStatus(`Deleted ${delSku}.`, 'ok'); cloudDelete(delSku); }
     });
 
-    // Event bindings
+    // Events
     categorySel.addEventListener('change', ()=>{ categoryCode.value = CATEGORY_MAP[categorySel.value] || ''; refreshSkuField(); });
     vendorName.addEventListener('blur', ()=>{ autoSuggestVendorCode(); refreshSkuField(); });
     vendorCode.addEventListener('input', refreshSkuField);
     productNumber.addEventListener('input', refreshSkuField);
     productName.addEventListener('input', ()=>{});
-
+    productUrl.addEventListener('input', ()=>{});
     suggestBtn.addEventListener('click', suggestNumber);
     saveBtn.addEventListener('click', saveRecord);
-    // (Manual Supabase UI removed — using built-in credentials)
     clearBtn.addEventListener('click', clearForm);
+
+    // Print current form label
+    printBtn.addEventListener('click', ()=>{
+      const cat = categoryCode.value; const ven = normalizeCode(vendorCode.value); const num = Number(productNumber.value);
+      if (!cat || ven.length!==3 || !num || num<1 || num>999) { setStatus('Fill Category, Vendor Code, and a valid number (001–999) to print.', 'bad'); return; }
+      const rec = { sku: buildSku(cat, ven, num), category_code: cat, category_name: categorySel.value, vendor_code: ven, vendor_name: vendorName.value.trim(), number: num, product_name: productName.value.trim(), product_url: productUrl.value.trim() };
+      printLabel(rec);
+    });
 
     filterCategory.addEventListener('change', renderTable);
     filterVendor.addEventListener('input', renderTable);
     resetFilters.addEventListener('click', ()=>{ filterCategory.value=''; filterVendor.value=''; renderTable(); });
 
-    exportCsv.addEventListener('click', ()=>{ download('julinemart_skus.csv', toCsv(loadSkus())); });
+    exportCsv.addEventListener('click', ()=> download('julinemart_skus.csv', toCsv(loadSkus())));
     importCsv.addEventListener('click', ()=> csvFile.click());
-    exportMapBtn.addEventListener('click', exportSkuMap);
-    importMapBtn.addEventListener('click', ()=> csvFile.click());
+    csvFile.addEventListener('change', ()=>{ const f = csvFile.files[0]; if (!f) return; const reader = new FileReader(); reader.onload = ()=> importFromCsvText(reader.result); reader.readAsText(f); csvFile.value = ''; });
 
-    csvFile.addEventListener('change', ()=>{
-      const f = csvFile.files[0]; if (!f) return;
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        if (f.name.endsWith('.json')) importSkuMapText(reader.result); else importFromCsvText(reader.result);
-      };
-      reader.readAsText(f); csvFile.value='';
-    });
-
-    // ===== Branding (logo) =====
+    // ===== Logo handling =====
     const logoFile = document.getElementById('logoFile');
     function loadLogo() { return localStorage.getItem('jm_logo_dataurl') || ''; }
     function saveLogo(dataurl) { localStorage.setItem('jm_logo_dataurl', dataurl); }
-    if (logoFile) {
-      logoFile.addEventListener('change', ()=>{
-        const f = logoFile.files[0]; if (!f) return;
-        const reader = new FileReader(); reader.onload = ()=> { saveLogo(reader.result); setStatus('Logo saved for this device. It will appear on printed labels.', 'ok'); logoFile.value=''; }; reader.readAsDataURL(f);
-      });
-    }
+    if (logoFile) logoFile.addEventListener('change', ()=>{ const f = logoFile.files[0]; if (!f) return; const reader = new FileReader(); reader.onload = ()=> { saveLogo(reader.result); setStatus('Logo saved for this device. It will appear on printed labels.', 'ok'); logoFile.value=''; }; reader.readAsDataURL(f); });
 
-    // ===== Print label with QR (prefers product_url) =====
+    // ===== Printing =====
     function printLabel(rec){
       const logo = loadLogo();
       const sku = String(rec.sku || '').trim();
-      const url = (rec.product_url && rec.product_url.trim()) || productUrlFromSku(sku);
+      const url = (rec.product_url && rec.product_url.trim()) ? rec.product_url.trim() : productUrlFromSku(sku);
       const qr1 = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
       const qr2 = 'https://quickchart.io/qr?size=180&text=' + encodeURIComponent(url);
       const w = window.open('', '_blank', 'width=800,height=600');
@@ -667,8 +601,7 @@
         .meta{font-size:12px;color:#444}
         .qr{margin-top:10px;display:flex;gap:12px;align-items:center}
         .title{font-size:14px;font-weight:600}
-        .url{font-size:11px;color:#555;margin-top:6px;word-break:break-all}
-      `;
+        .url{font-size:11px;color:#555;margin-top:6px;word-break:break-all}`;
       w.document.write(`<!DOCTYPE html><html><head><title>Label ${sku}</title><style>${styles}</style></head><body>
         <div class="label">
           <div class="top">
@@ -688,9 +621,6 @@
             var fb=document.getElementById('fallback');
             var QR1 = ${JSON.stringify(qr1)};
             var QR2 = ${JSON.stringify(qr2)};
-            // Inject strings safely to avoid escaping issues
-            QR1 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr1)} + ${JSON.stringify('').slice(1)};
-            QR2 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr2)} + ${JSON.stringify('').slice(1)};
             function done(){ setTimeout(function(){ window.print(); }, 300); }
             img.onerror=function(){ if (img.src.indexOf('qrserver')!==-1){ img.src = QR2; } else { img.remove(); fb.style.display='inline'; done(); } };
             img.onload=done; img.src = QR1;
@@ -699,101 +629,68 @@
       </body></html>`);
       w.document.close();
     }
-<style>
-  /* nav “active” state */
-  .pill.active { background: var(--accent-2); color:#0b0f14; border-color:#cc7e09; }
-</style>
 
-<script>
-  // --- Page toggling (Create/Search) ---
-  const pageCreate = document.getElementById('page-create');
-  const pageSearch = document.getElementById('page-search');
-  const navCreate  = document.getElementById('navCreate');
-  const navSearch  = document.getElementById('navSearch');
-  const sbStatus   = document.getElementById('sbStatus');
-
-  function showPage(which){
-    if (!pageCreate || !pageSearch) return;
-    pageCreate.style.display = which === 'create' ? 'block' : 'none';
-    pageSearch.style.display = which === 'search' ? 'block' : 'none';
-    if (navCreate && navSearch) {
-      navCreate.classList.toggle('active', which === 'create');
-      navSearch.classList.toggle('active', which === 'search');
-    }
-  }
-
-  // attach nav events (guard in case elements are missing)
-  if (navCreate) navCreate.addEventListener('click', () => showPage('create'));
-  if (navSearch) navSearch.addEventListener('click', () => { renderTable(); showPage('search'); });
-
-  // call this once at startup
-  showPage('create');
-
-  // --- Make sure action buttons are wired even if earlier code aborted once ---
-  const suggestBtn = document.getElementById('suggestBtn');
-  const saveBtn    = document.getElementById('saveBtn');
-  const printBtn   = document.getElementById('printBtn');
-  const clearBtn   = document.getElementById('clearBtn');
-
-  if (suggestBtn && !suggestBtn._bound) { suggestBtn.addEventListener('click', suggestNumber); suggestBtn._bound = true; }
-  if (saveBtn && !saveBtn._bound)    { saveBtn.addEventListener('click', saveRecord); saveBtn._bound = true; }
-  if (printBtn && !printBtn._bound)  {
-    printBtn.addEventListener('click', () => {
-      const cat = document.getElementById('categoryCode').value;
-      const ven = (document.getElementById('vendorCode').value || '').toUpperCase();
-      const num = Number(document.getElementById('productNumber').value);
-      if (!cat || ven.length !== 3 || !num || num < 1 || num > 999) return setStatus('Fill Category, Vendor Code and a valid number (001–999) to print.', 'bad');
-      const rec = {
-        sku: `${cat}-${ven}-${String(num).padStart(3,'0')}`,
-        category_code: cat,
-        category_name: document.getElementById('category').value,
-        vendor_code: ven,
-        vendor_name: (document.getElementById('vendorName').value || '').trim(),
-        number: num,
-        product_name: (document.getElementById('productName').value || '').trim(),
-        product_url: (document.getElementById('productUrl')?.value || '').trim(),
-      };
-      printLabel(rec);
-    });
-    printBtn._bound = true;
-  }
-  if (clearBtn && !clearBtn._bound) { clearBtn.addEventListener('click', clearForm); clearBtn._bound = true; }
-
-  // --- Update Supabase badge safely ---
-  function setSbBadge(ok, msg){
-    if (!sbStatus) return;
-    sbStatus.textContent = msg || (ok ? 'Supabase ✓' : 'Supabase not available');
-    sbStatus.className = 'pill ' + (ok ? 'ok' : 'bad');
-  }
-  // wherever you mark connection success/failure, call:
-  //   setSbBadge(true, 'Supabase ✓');
-  //   setSbBadge(false, 'Supabase not available');
-    
-    // ===== Tiny self-tests =====
-    (function runSelfTests(){
-      const results = [];
-      function test(name, fn){ try { fn(); results.push({name, ok:true}); } catch(e){ console.error('Test failed:', name, e); results.push({name, ok:false, err:e}); } }
-      test('numberTo3 pads', ()=> { if (numberTo3(7) !== '007') throw new Error('pad'); });
-      test('buildSku format', ()=> { if (buildSku('WMN','QUE',7) !== 'WMN-QUE-007') throw new Error('format'); });
-      test('productUrlFromSku', ()=> { if (productUrlFromSku('WMN-QUE-007') !== 'https://julinemart.com/p/WMN-QUE-007') throw new Error('url'); });
-      test('route regex', ()=> { const re=/^\/p\/([A-Za-z]{3}-[A-Za-z]{3}-\d{3})$/; if (!re.test('/p/FAS-COL-001')||re.test('/p/fas-col-0001')) throw new Error('regex'); });
-      const pass = results.filter(r=>r.ok).length; const el = document.getElementById('selfTest');
-      if (pass === results.length) { el.textContent = 'Self‑tests: all passed'; el.classList.add('ok'); }
-      else { el.textContent = `Self‑tests: ${pass}/${results.length} passed`; el.classList.add('bad'); }
+    // ===== Public route: /p/<SKU> → redirect via Supabase =====
+    (function handlePublicRoute(){
+      try {
+        var path = String(location.pathname || '');
+        while (path.length > 1 && path.endsWith('/')) { path = path.slice(0, -1); }
+        var re = new RegExp('^/p/([A-Za-z]{3}-[A-Za-z]{3}-\\d{3})$','i');
+        var m = path.match(re);
+        if (!m) return; // not a public product route
+        var sku = m[1].toUpperCase();
+        var css = document.createElement('style');
+        css.textContent = '.overlay{position:fixed;inset:0;background:#0b0f14;color:#e8eefc;display:flex;align-items:center;justify-content:center;padding:24px}'+
+                          '.box{max-width:680px;width:100%;background:linear-gradient(180deg,#121822,#0f1620);border:1px solid #1f2937;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}'+
+                          '.row{margin:8px 0}.sku{font-family:ui-monospace,Consolas,monospace;font-size:18px;font-weight:700}'+
+                          '.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}'+
+                          '.btn{padding:10px 14px;border-radius:10px;border:1px solid #1f2937;background:#0b111a;color:#e8eefc;cursor:pointer}'+
+                          '.accent{background:#4f2cac;border-color:#3e2492}';
+        document.head.appendChild(css);
+        var wrap = document.createElement('div');
+        wrap.className = 'overlay';
+        wrap.innerHTML = '<div class="box">'+
+          '<div class="row">Opening product…</div>'+
+          '<div class="row sku" id="ovSku">'+sku+'</div>'+
+          '<div class="row" id="ovMsg">Checking cloud mapping…</div>'+
+          '<div class="btns">'+
+            '<button class="btn accent" id="ovCopy">Copy SKU</button>'+
+            '<a class="btn" id="ovHome" href="https://julinemart.com" target="_self">Go to JulineMart</a>'+
+          '</div>'+
+        '</div>';
+        document.body.innerHTML = ''; document.body.appendChild(wrap);
+        var msg = document.getElementById('ovMsg');
+        if (navigator.clipboard) document.getElementById('ovCopy').onclick = function(){ navigator.clipboard.writeText(sku).then(function(){ msg.textContent = 'Copied '+sku+' ✅'; }).catch(function(){ msg.textContent='Copy failed — use long‑press to copy.'; }); };
+        var sb = getSupabase(); if (!sb){ msg.textContent = 'Supabase not available.'; return; }
+        sb.from('skus').select('product_url').eq('sku', sku).maybeSingle().then(function(res){
+          if (res.error){ msg.textContent = 'Error fetching from Supabase: '+res.error.message; return; }
+          if (res.data && res.data.product_url){ msg.textContent = 'Redirecting to product page…'; location.replace(res.data.product_url); }
+          else { msg.textContent = 'No product page linked to this SKU yet.'; }
+        });
+      } catch(e) { /* ignore */ }
     })();
 
-    // Init
+    // ===== Self-tests =====
+    (function runSelfTests(){
+      const results = [];
+      function test(name, fn){ try { fn(); results.push({name, ok:true}); } catch(e){ console.error('Test failed:', name, e); results.push({name, ok:false}); } }
+      test('numberTo3 pads to 3 digits', ()=> { if (numberTo3(7) !== '007') throw new Error('pad'); });
+      test('buildSku format', ()=> { if (buildSku('WMN','QUE',7) !== 'WMN-QUE-007') throw new Error('format'); });
+      test('public route regex', ()=>{ const re=/^\/p\/([A-Za-z]{3}-[A-Za-z]{3}-\d{3})$/i; if(!re.test('/p/FAS-COL-001')) throw new Error('regex'); });
+      test('supabase client exists', ()=> { if (!getSupabase()) throw new Error('no client'); });
+      const el = document.getElementById('selfTest');
+      const pass = results.filter(r=>r.ok).length; el.textContent = pass===results.length? 'Self‑tests: all passed' : `Self‑tests: ${pass}/${results.length} passed`;
+      el.className = 'pill ' + (pass===results.length?'ok':'bad');
+    })();
+
+    // ===== Init =====
     (function init(){
-      const catSel = document.getElementById('category');
-      const filtSel = document.getElementById('filterCategory');
-      catSel.innerHTML=''; filtSel.innerHTML='<option value="">All</option>';
-      Object.keys(CATEGORY_MAP).forEach(name=>{ const code=CATEGORY_MAP[name]; const o=document.createElement('option'); o.value=name; o.textContent=name; catSel.appendChild(o); const f=document.createElement('option'); f.value=code; f.textContent=code+' — '+name; filtSel.appendChild(f); });
-      document.getElementById('categoryCode').value=CATEGORY_MAP[catSel.value]||'';
+      populateCategories();
+      showPage('create');
       renderTable();
-      // Auto-connect + live sync
-      try{ pullFromCloud().then(()=> enableLiveSync()); setStatus('Connected to Supabase ✓', 'ok'); }catch(e){ /* ignore */ }
+      // Cloud sync
+      pullFromCloud().then(()=> enableLiveSync());
     })();
   </script>
 </body>
 </html>
-
