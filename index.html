@@ -65,98 +65,108 @@
 </head>
 <body>
   <header>
-    <h1>JulineMart SKU Generator <span class="pill">MVP • Offline-first</span></h1>
-    <span id="selfTest" class="pill">Running tests…</span>
+    <h1>JulineMart SKU Generator <span class="pill">MVP • Cloud‑sync</span></h1>
+    <nav style="margin-left:auto; display:flex; gap:8px; align-items:center">
+      <button id="navCreate" class="pill" style="cursor:pointer">Create</button>
+      <button id="navSearch" class="pill" style="cursor:pointer">Search</button>
+      <span id="sbStatus" class="pill" title="Supabase connection status">Connecting…</span>
+    </nav>
   </header>
   <div class="container">
-    <div class="grid">
-      <div class="card">
-        <h2>Create / Update SKU</h2>
-        <div class="row row-2">
-          <div>
-            <label>Category</label>
-            <select id="category"></select>
+    <!-- PAGE: CREATE -->
+    <section id="page-create">
+      <div class="grid" style="grid-template-columns: 1fr; gap:20px">
+        <div class="card">
+          <h2>Create / Update SKU</h2>
+          <div class="row row-2">
+            <div>
+              <label>Category</label>
+              <select id="category"></select>
+            </div>
+            <div>
+              <label>Category Code</label>
+              <input type="text" id="categoryCode" readonly />
+            </div>
           </div>
-          <div>
-            <label>Category Code</label>
-            <input type="text" id="categoryCode" readonly />
+          <div class="row row-2">
+            <div>
+              <label>Vendor Name</label>
+              <input type="text" id="vendorName" placeholder="e.g., Queen Styles" />
+            </div>
+            <div>
+              <label>Vendor Code (3 letters)</label>
+              <input type="text" id="vendorCode" placeholder="e.g., QUE" maxlength="3" />
+            </div>
           </div>
-        </div>
-        <div class="row row-2">
-          <div>
-            <label>Vendor Name</label>
-            <input type="text" id="vendorName" placeholder="e.g., Queen Styles" />
+          <div class="row row-3">
+            <div>
+              <label>Product Number (001–999)</label>
+              <input type="number" id="productNumber" min="1" max="999" />
+              <div class="note muted">Auto-suggests next available on Category+Vendor</div>
+            </div>
+            <div>
+              <label>Product Name (optional)</label>
+              <input type="text" id="productName" placeholder="e.g., Ankara Maxi Dress" />
+            </div>
+            <div>
+              <label>SKU</label>
+              <input type="text" id="sku" class="sku" readonly />
+            </div>
           </div>
-          <div>
-            <label>Vendor Code (3 letters)</label>
-            <input type="text" id="vendorCode" placeholder="e.g., QUE" maxlength="3" />
+          <div class="row">
+            <div>
+              <label>Product URL (optional — used for public redirect)</label>
+              <input type="text" id="productUrl" placeholder="https://julinemart.com/product/..."/>
+              <div class="note muted">If provided, QR will point directly to this URL. If empty, QR uses <span class="kbd">/p/&lt;SKU&gt;</span> which looks up the URL in cloud.</div>
+            </div>
           </div>
-        </div>
-        <div class="row row-3">
-          <div>
-            <label>Product Number (001–999)</label>
-            <input type="number" id="productNumber" min="1" max="999" />
-            <div class="note muted">Auto-suggests next available on Category+Vendor</div>
-          </div>
-          <div>
-            <label>Product Name (optional)</label>
-            <input type="text" id="productName" placeholder="e.g., Ankara Maxi Dress" />
-          </div>
-          <div>
-            <label>SKU</label>
-            <input type="text" id="sku" class="sku" readonly />
-          </div>
-        </div>
-        <div class="row row-2">
-          <div>
-            <label>Product URL (optional – e.g., https://julinemart.com/product/...)</label>
-            <input type="url" id="productUrl" placeholder="https://julinemart.com/product/..." />
-            <div class="note muted">If provided, QR will point directly to this URL. If empty, QR uses <span class="kbd">/p/&lt;SKU&gt;</span> which will redirect using <span class="kbd">sku-map.json</span>.</div>
-          </div>
-          <div></div>
-        </div>
-        <div id="status" class="note"></div>
-        <div class="actions" style="display:none"></div>
-      </div>
 
-      <div class="card midcol">
-        <h2>Actions</h2>
-        <div class="vstack">
-          <button class="primary" id="suggestBtn">Suggest Number</button>
-          <button class="success" id="saveBtn">Save SKU</button>
-          <button id="printBtn">Print Label</button>
-          <button id="clearBtn">Clear</button>
+          <div class="actions" style="display:flex; gap:10px; margin-top:16px">
+            <button class="primary" id="suggestBtn">Suggest Number</button>
+            <button class="success" id="saveBtn">Save SKU</button>
+            <button id="printBtn">Print Label</button>
+            <button id="clearBtn">Clear</button>
+          </div>
+          <div id="status" class="note"></div>
+        </div>
+        <div class="card">
+          <h2>Branding</h2>
+          <label>Upload Logo (PNG/SVG)</label>
+          <input type="file" id="logoFile" accept="image/*">
+          <div class="note muted">Your logo will be printed on labels and saved to this browser only.</div>
         </div>
       </div>
+    </section>
 
-      <div class="card">
-        <h2>Search / Export</h2>
-        <div class="row row-2">
-          <div>
-            <label>Filter by Category</label>
-            <select id="filterCategory"></select>
+    <!-- PAGE: SEARCH -->
+    <section id="page-search" style="display:none">
+      <div class="grid" style="grid-template-columns: 1fr; gap:20px">
+        <div class="card">
+          <h2>Search / Export</h2>
+          <div class="row row-2">
+            <div>
+              <label>Filter by Category</label>
+              <select id="filterCategory"></select>
+            </div>
+            <div>
+              <label>Filter by Vendor Code</label>
+              <input type="text" id="filterVendor" placeholder="e.g., QUE" maxlength="3" />
+            </div>
           </div>
-          <div>
-            <label>Filter by Vendor Code</label>
-            <input type="text" id="filterVendor" placeholder="e.g., QUE" maxlength="3" />
+          <div class="actions">
+            <button id="resetFilters">Reset</button>
+            <button id="exportCsv">Export CSV</button>
+            <button class="warn" id="importCsv">Import CSV</button>
+            <input type="file" id="csvFile" accept=".csv" style="display:none" />
           </div>
-        </div>
-        <div class="actions">
-          <button id="resetFilters">Reset</button>
-          <button id="exportCsv">Export CSV</button>
-          <button class="warn" id="importCsv">Import CSV</button>
-          <input type="file" id="csvFile" accept=".csv,.json" style="display:none" />
-          <button id="exportMap">Export sku-map.json</button>
-          <button id="importMap">Import sku-map.json</button>
-        </div>
-        <div class="list">
-          <table>
-            <thead>
+          <div class="list">
+            <table>
+              <thead>
               <tr>
                 <th>SKU</th>
                 <th>Category</th>
                 <th>Vendor</th>
-                <th>No.</th>
+                <th>Number</th>
                 <th>Product</th>
                 <th>URL</th>
                 <th>Created</th>
@@ -164,17 +174,12 @@
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
-          </table>
+            </table>
+          </div>
+          <div class="footer">Storage: Local (browser) + Supabase cloud sync. Export CSV for backup.</div>
         </div>
-        <div class="footer">Storage: Local (browser). Export <span class="kbd">sku-map.json</span> and commit to GitHub for public redirects. Supabase sync is next.</div>
-
-      <div class="card">
-        <h2>Branding</h2>
-        <label>Upload Logo (PNG/SVG)</label>
-        <input type="file" id="logoFile" accept="image/*">
-        <div class="note muted">Your logo will be printed on labels and saved to this browser only.</div>
       </div>
-    </div>
+    </section>
   </div>
 
   <div id="printArea" style="display:none"></div>
