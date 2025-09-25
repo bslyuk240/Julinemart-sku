@@ -699,7 +699,76 @@
       </body></html>`);
       w.document.close();
     }
+<style>
+  /* nav “active” state */
+  .pill.active { background: var(--accent-2); color:#0b0f14; border-color:#cc7e09; }
+</style>
 
+<script>
+  // --- Page toggling (Create/Search) ---
+  const pageCreate = document.getElementById('page-create');
+  const pageSearch = document.getElementById('page-search');
+  const navCreate  = document.getElementById('navCreate');
+  const navSearch  = document.getElementById('navSearch');
+  const sbStatus   = document.getElementById('sbStatus');
+
+  function showPage(which){
+    if (!pageCreate || !pageSearch) return;
+    pageCreate.style.display = which === 'create' ? 'block' : 'none';
+    pageSearch.style.display = which === 'search' ? 'block' : 'none';
+    if (navCreate && navSearch) {
+      navCreate.classList.toggle('active', which === 'create');
+      navSearch.classList.toggle('active', which === 'search');
+    }
+  }
+
+  // attach nav events (guard in case elements are missing)
+  if (navCreate) navCreate.addEventListener('click', () => showPage('create'));
+  if (navSearch) navSearch.addEventListener('click', () => { renderTable(); showPage('search'); });
+
+  // call this once at startup
+  showPage('create');
+
+  // --- Make sure action buttons are wired even if earlier code aborted once ---
+  const suggestBtn = document.getElementById('suggestBtn');
+  const saveBtn    = document.getElementById('saveBtn');
+  const printBtn   = document.getElementById('printBtn');
+  const clearBtn   = document.getElementById('clearBtn');
+
+  if (suggestBtn && !suggestBtn._bound) { suggestBtn.addEventListener('click', suggestNumber); suggestBtn._bound = true; }
+  if (saveBtn && !saveBtn._bound)    { saveBtn.addEventListener('click', saveRecord); saveBtn._bound = true; }
+  if (printBtn && !printBtn._bound)  {
+    printBtn.addEventListener('click', () => {
+      const cat = document.getElementById('categoryCode').value;
+      const ven = (document.getElementById('vendorCode').value || '').toUpperCase();
+      const num = Number(document.getElementById('productNumber').value);
+      if (!cat || ven.length !== 3 || !num || num < 1 || num > 999) return setStatus('Fill Category, Vendor Code and a valid number (001–999) to print.', 'bad');
+      const rec = {
+        sku: `${cat}-${ven}-${String(num).padStart(3,'0')}`,
+        category_code: cat,
+        category_name: document.getElementById('category').value,
+        vendor_code: ven,
+        vendor_name: (document.getElementById('vendorName').value || '').trim(),
+        number: num,
+        product_name: (document.getElementById('productName').value || '').trim(),
+        product_url: (document.getElementById('productUrl')?.value || '').trim(),
+      };
+      printLabel(rec);
+    });
+    printBtn._bound = true;
+  }
+  if (clearBtn && !clearBtn._bound) { clearBtn.addEventListener('click', clearForm); clearBtn._bound = true; }
+
+  // --- Update Supabase badge safely ---
+  function setSbBadge(ok, msg){
+    if (!sbStatus) return;
+    sbStatus.textContent = msg || (ok ? 'Supabase ✓' : 'Supabase not available');
+    sbStatus.className = 'pill ' + (ok ? 'ok' : 'bad');
+  }
+  // wherever you mark connection success/failure, call:
+  //   setSbBadge(true, 'Supabase ✓');
+  //   setSbBadge(false, 'Supabase not available');
+    
     // ===== Tiny self-tests =====
     (function runSelfTests(){
       const results = [];
@@ -727,3 +796,4 @@
   </script>
 </body>
 </html>
+
