@@ -20,9 +20,10 @@
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, #0b0f14, #0a0d12 60%, #0c1017); color: var(--text); }
     header { padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(11,15,20,0.8); backdrop-filter: blur(8px); z-index: 5; display:flex; align-items:center; gap:8px; }
     h1 { margin: 0; font-size: 20px; letter-spacing: 0.4px; }
-    .container { max-width: 1200px; margin: 20px auto; padding: 0 16px 40px; }
+    .container { width: 100%; max-width: none; margin: 20px auto; padding: 0 20px 40px; }
     .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 1100px) { .grid { grid-template-columns: 1.1fr 1fr; } }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1.5fr 1fr; } }
+    @media (min-width: 1280px) { .grid { grid-template-columns: 2fr 1fr 1fr; } } }
     .card { background: linear-gradient(180deg, #121822, #0f1620); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
     .card h2 { margin: 0 0 12px 0; font-size: 18px; }
     label { display: block; margin: 10px 0 6px; color: var(--muted); font-size: 13px; }
@@ -52,6 +53,11 @@
   </style>
   <!-- Supabase client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Hardcoded Supabase credentials (as requested). For production, prefer env vars + stricter RLS.
+    const SUPABASE_URL = 'https://hnpwnjjjgxuelfognakp.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucHduampqZ3h1ZWxmb2duYWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3NTU2NDYsImV4cCI6MjA3NDMzMTY0Nn0.AVaBAzmddxnZz23YIu7IaeZzTEPI6n8CjyahRQvZSHk';
+  </script>
 </head>
 <body>
   <header>
@@ -154,28 +160,6 @@
         <div class="footer">Storage: Local (browser). Export <span class="kbd">sku-map.json</span> and commit to GitHub for public redirects. Supabase sync is next.</div>
 
       <div class="card">
-        <h2>Cloud Sync (Supabase)</h2>
-        <div class="row row-2">
-          <div>
-            <label>SUPABASE_URL</label>
-            <input type="text" id="sbUrl" placeholder="https://xxxxxx.supabase.co" />
-          </div>
-          <div>
-            <label>SUPABASE_ANON_KEY</label>
-            <input type="text" id="sbKey" placeholder="eyJhbGciOi..." />
-          </div>
-        </div>
-        <div class="actions">
-          <button id="sbConnect" class="primary">Connect</button>
-          <button id="sbPull">Pull (cloud ➜ local)</button>
-          <button id="sbPush" class="warn">Push (local ➜ cloud)</button>
-          <button id="sbLive">Enable Live Sync</button>
-          <button id="sbDownloadSql">Download schema.sql</button>
-        </div>
-        <div class="note muted">Paste your Supabase project URL + anon key (stored only on this device). We’ll upsert to a <span class="kbd">skus</span> table with a unique index on <span class="kbd">sku</span>.</div>
-      </div>
-
-      <div class="card">
         <h2>Branding</h2>
         <label>Upload Logo (PNG/SVG)</label>
         <input type="file" id="logoFile" accept="image/*">
@@ -220,12 +204,7 @@
         var copyBtn = document.getElementById('ovCopy');
         copyBtn.onclick = function(){ if (navigator.clipboard) { navigator.clipboard.writeText(sku).then(function(){ msg.textContent = 'Copied '+sku+' ✅'; }).catch(function(){ msg.textContent='Copy failed — use long‑press to copy.'; }); } };
         // === Supabase query ===
-        var cfgStr = localStorage.getItem('jm_supabase_cfg_v1');
-        if (!cfgStr){ msg.textContent = 'Supabase not configured. Please set it up in the SKU app.'; return; }
-        var cfg = {};
-        try{ cfg = JSON.parse(cfgStr); }catch{}
-        if (!cfg.url || !cfg.key){ msg.textContent = 'Supabase config missing.'; return; }
-        var sb = window.supabase.createClient(cfg.url, cfg.key, { auth:{persistSession:false} });
+        var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:false} });
         sb.from('skus').select('product_url').eq('sku', sku).maybeSingle().then(function(res){
           if (res.error){ msg.textContent = 'Error fetching from Supabase: '+res.error.message; return; }
           if (res.data && res.data.product_url){
@@ -357,15 +336,10 @@
     const tableBody = document.getElementById('tableBody');
 
     // ===== Supabase helpers =====
-    const LS_SUPA = 'jm_supabase_cfg_v1';
-    function loadSupaCfg(){ try{return JSON.parse(localStorage.getItem(LS_SUPA)||'{}')}catch{ return {}; } }
-    function saveSupaCfg(cfg){ localStorage.setItem(LS_SUPA, JSON.stringify(cfg||{})); }
     function getSupabase(){
-      const cfg = loadSupaCfg();
-      if (!cfg.url || !cfg.key || !window.supabase) return null;
-      if (!getSupabase._client || getSupabase._cachedKey!==cfg.key || getSupabase._cachedUrl!==cfg.url){
-        getSupabase._client = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: false } });
-        getSupabase._cachedKey = cfg.key; getSupabase._cachedUrl = cfg.url;
+      if (!window.supabase) return null;
+      if (!getSupabase._client){
+        getSupabase._client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
       }
       return getSupabase._client;
     }
@@ -388,52 +362,6 @@
     async function cloudDelete(sku){ const sb=getSupabase(); if (!sb) return; const {error}=await sb.from('skus').delete().eq('sku', sku); if (error) setStatus('Supabase delete failed: '+error.message, 'bad'); }
     async function cloudFetchAll(){ const sb=getSupabase(); if (!sb) throw new Error('Not connected'); const { data, error } = await sb.from('skus').select('*'); if (error) throw error; return data||[]; }
 
-    function downloadText(name, text, mime){ download(name, text, mime||'text/plain'); }
-
-    const SCHEMA_SQL = `-- JulineMart SKU schema (run in Supabase SQL editor)
-create table if not exists public.skus (
-  sku text primary key,
-  category_code text not null,
-  category_name text,
-  vendor_code text not null,
-  vendor_name text,
-  number int not null check (number between 1 and 999),
-  product_name text,
-  product_url text,
-  created_at timestamptz default now() not null,
-  updated_at timestamptz default now() not null
-);
-
--- Enable Row Level Security
-alter table public.skus enable row level security;
-
--- TEMP policies for MVP (anyone with anon key can read/write). Tighten later.
-create policy if not exists "skus read" on public.skus for select using (true);
-create policy if not exists "skus insert" on public.skus for insert with check (true);
-create policy if not exists "skus update" on public.skus for update using (true) with check (true);
-create policy if not exists "skus delete" on public.skus for delete using (true);
-
--- Update trigger
-create or replace function public.touch_updated_at() returns trigger language plpgsql as $$
-begin new.updated_at = now(); return new; end; $$;
-create or replace trigger skus_touch_updated
-before update on public.skus
-for each row execute function public.touch_updated_at();`;
-
-    async function connectSupabase(){
-      const url = document.getElementById('sbUrl').value.trim();
-      const key = document.getElementById('sbKey').value.trim();
-      if (!url || !key){ setStatus('Enter SUPABASE_URL and SUPABASE_ANON_KEY', 'bad'); return; }
-      saveSupaCfg({url, key});
-      try{
-        const sb = getSupabase();
-        const { error } = await sb.from('skus').select('sku', { count: 'exact', head: true });
-        if (error && !/relation .* does not exist/i.test(error.message)) throw error;
-        if (error){ setStatus('Connected. Now open Supabase SQL editor and run downloaded schema.sql', 'ok'); }
-        else { setStatus('Connected to Supabase ✓', 'ok'); }
-      }catch(e){ setStatus('Supabase connect failed: '+e.message, 'bad'); }
-    }
-
     async function pullFromCloud(){
       try {
         const cloud = await cloudFetchAll();
@@ -453,22 +381,12 @@ for each row execute function public.touch_updated_at();`;
       } catch(e){ setStatus('Pull failed: '+e.message, 'bad'); }
     }
 
-    async function pushToCloud(){
-      const list = loadSkus();
-      let ok=0, fail=0;
-      for (const r of list){ try{ await cloudUpsert(r); ok++; } catch{ fail++; } }
-      setStatus(`Pushed ${ok} records to cloud${fail?`, ${fail} failed`:''}.`, 'ok');
-    }
-
     function enableLiveSync(){
-      const sb=getSupabase(); if (!sb){ setStatus('Connect first.', 'bad'); return; }
-      // Listen to local saves and push up; also subscribe to postgres changes to pull down.
+      const sb=getSupabase(); if (!sb){ setStatus('Supabase not available.', 'bad'); return; }
       if (!enableLiveSync._bound){
-        // local hook: monkey-patch saveSkus
         const _save = saveSkus;
         window.saveSkus = function(list){ _save(list); const last=list[list.length-1]; if (last) cloudUpsert(last); };
-        // realtime
-        sb.channel('skus-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'skus' }, (payload)=>{ pullFromCloud(); }).subscribe();
+        sb.channel('skus-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'skus' }, ()=>{ pullFromCloud(); }).subscribe();
         enableLiveSync._bound = true;
       }
       setStatus('Live sync enabled ✓', 'ok');
@@ -688,17 +606,7 @@ for each row execute function public.touch_updated_at();`;
 
     suggestBtn.addEventListener('click', suggestNumber);
     saveBtn.addEventListener('click', saveRecord);
-    // Supabase UI events
-    const sbConnect = document.getElementById('sbConnect');
-    const sbPull = document.getElementById('sbPull');
-    const sbPush = document.getElementById('sbPush');
-    const sbLive = document.getElementById('sbLive');
-    const sbDownloadSql = document.getElementById('sbDownloadSql');
-    if (sbConnect) sbConnect.addEventListener('click', connectSupabase);
-    if (sbPull) sbPull.addEventListener('click', pullFromCloud);
-    if (sbPush) sbPush.addEventListener('click', pushToCloud);
-    if (sbLive) sbLive.addEventListener('click', enableLiveSync);
-    if (sbDownloadSql) sbDownloadSql.addEventListener('click', ()=> downloadText('schema.sql', SCHEMA_SQL, 'text/sql'));
+    // (Manual Supabase UI removed — using built-in credentials)
     clearBtn.addEventListener('click', clearForm);
 
     filterCategory.addEventListener('change', renderTable);
@@ -764,8 +672,8 @@ for each row execute function public.touch_updated_at();`;
           (function(){
             var img=document.getElementById('qr');
             var fb=document.getElementById('fallback');
-            var QR1 = ${JSON.stringify('')};
-            var QR2 = ${JSON.stringify('')};
+            var QR1 = ${JSON.stringify(qr1)};
+            var QR2 = ${JSON.stringify(qr2)};
             // Inject strings safely to avoid escaping issues
             QR1 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr1)} + ${JSON.stringify('').slice(1)};
             QR2 = ${JSON.stringify('').slice(0,-1)} + ${JSON.stringify(qr2)} + ${JSON.stringify('').slice(1)};
@@ -793,13 +701,14 @@ for each row execute function public.touch_updated_at();`;
 
     // Init
     (function init(){
-      // Populate categories select controls
       const catSel = document.getElementById('category');
       const filtSel = document.getElementById('filterCategory');
       catSel.innerHTML=''; filtSel.innerHTML='<option value="">All</option>';
       Object.keys(CATEGORY_MAP).forEach(name=>{ const code=CATEGORY_MAP[name]; const o=document.createElement('option'); o.value=name; o.textContent=name; catSel.appendChild(o); const f=document.createElement('option'); f.value=code; f.textContent=code+' — '+name; filtSel.appendChild(f); });
       document.getElementById('categoryCode').value=CATEGORY_MAP[catSel.value]||'';
       renderTable();
+      // Auto-connect + live sync
+      try{ pullFromCloud().then(()=> enableLiveSync()); setStatus('Connected to Supabase ✓', 'ok'); }catch(e){ /* ignore */ }
     })();
   </script>
 </body>
