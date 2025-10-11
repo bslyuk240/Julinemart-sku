@@ -38,7 +38,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      flex-wrap: wrap;
     }
     .logo-title {
       display: flex;
@@ -52,6 +51,12 @@
     }
     h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
     
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -75,11 +80,23 @@
       color: var(--purple);
     }
     
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .menu-toggle svg {
+      width: 24px;
+      height: 24px;
+    }
+
     .status-badges {
       display: flex;
       gap: 8px;
       align-items: center;
-      flex-wrap: wrap;
     }
     .badge {
       padding: 6px 12px;
@@ -300,12 +317,48 @@
     
     @media (max-width: 768px) {
       .header-content {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-wrap: wrap;
       }
-      .status-badges {
-        order: -1;
+      .header-right {
         width: 100%;
+        justify-content: space-between;
+        margin-top: 12px;
+      }
+      .status-badges .badge {
+        padding: 4px 8px;
+        font-size: 10px;
+      }
+      .status-badges .badge span:last-child {
+        display: none;
+      }
+      .status-badges .badge.success span:last-child,
+      .status-badges .badge.error span:last-child {
+        display: inline;
+      }
+      .nav-menu {
+        position: relative;
+      }
+      .menu-toggle {
+        display: block;
+      }
+      .nav-tabs {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--purple);
+        flex-direction: column;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        padding: 8px;
+        margin-top: 8px;
+        width: 180px;
+      }
+      .nav-menu.menu-open .nav-tabs {
+        display: flex;
+      }
+      .nav-tab {
+        text-align: left;
       }
       h1 {
         font-size: 18px;
@@ -331,19 +384,26 @@
         <img id="headerLogo" class="header-logo" style="display:none" alt="Logo">
         <h1>JulineMart SKU Generator</h1>
       </div>
-      <nav class="nav-tabs">
-        <button class="nav-tab active" data-page="create">Create</button>
-        <button class="nav-tab" data-page="search">Search</button>
-        <button class="nav-tab" data-page="settings">⚙️ Settings</button>
-      </nav>
-      <div class="status-badges">
-        <div class="badge" id="sbStatus">
-          <span class="badge-dot"></span>
-          <span>Connecting...</span>
+      <div class="header-right">
+        <div class="status-badges">
+          <div class="badge" id="sbStatus">
+            <span class="badge-dot"></span>
+            <span>Connecting...</span>
+          </div>
+          <div class="badge" id="selfTest">
+            <span class="badge-dot"></span>
+            <span>Testing...</span>
+          </div>
         </div>
-        <div class="badge" id="selfTest">
-          <span class="badge-dot"></span>
-          <span>Testing...</span>
+        <div class="nav-menu">
+          <button class="menu-toggle">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+          </button>
+          <nav class="nav-tabs">
+            <button class="nav-tab active" data-page="create">Create</button>
+            <button class="nav-tab" data-page="search">Search</button>
+            <button class="nav-tab" data-page="settings">⚙️ Settings</button>
+          </nav>
         </div>
       </div>
     </div>
@@ -1310,6 +1370,10 @@
         console.warn('Initial sync failed, using local data:', err.message);
         setSbBadge(false, 'Offline');
         updateSyncStatus(false);
+      });
+
+      document.querySelector('.menu-toggle').addEventListener('click', () => {
+        document.querySelector('.nav-menu').classList.toggle('menu-open');
       });
     })();
   </script>
