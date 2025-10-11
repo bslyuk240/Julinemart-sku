@@ -313,6 +313,17 @@
       max-width: 200px;
       max-height: 80px;
       object-fit: contain;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .logo-error {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .header-logo.broken {
+      display: none !important;
     }
     
     .icon {
@@ -550,6 +561,7 @@
         <div class="logo-preview" id="logoPreview"></div>
         <div class="btn-group">
           <button class="btn-primary" id="saveLogoBtn">Save Logo</button>
+          <button class="btn-secondary" id="clearLogoBtn">Remove Logo</button>
         </div>
       </div>
       
@@ -1040,21 +1052,101 @@
       const logoUrlInput = document.getElementById('logoUrl');
       const logoPreview = document.getElementById('logoPreview');
 
+      // Clear any previous error state
+      headerLogo.classList.remove('broken');
+
       if (logoUrl) {
-        headerLogo.src = logoUrl;
-        headerLogo.style.display = 'block';
         logoUrlInput.value = logoUrl;
-        logoPreview.innerHTML = `<img src="${logoUrl}" alt="Logo Preview">`;
+        updateLogoDisplay(logoUrl, headerLogo, logoPreview);
       } else {
         headerLogo.style.display = 'none';
+        headerLogo.src = '';
+        logoPreview.innerHTML = '';
       }
 
+      // Save logo button
       document.getElementById('saveLogoBtn').addEventListener('click', () => {
         const newLogoUrl = logoUrlInput.value.trim();
+        if (!newLogoUrl) {
+          setStatus('Please enter a logo URL', 'error');
+          return;
+        }
+        
+        // Validate URL format
+        try {
+          new URL(newLogoUrl);
+        } catch (e) {
+          setStatus('Please enter a valid URL', 'error');
+          return;
+        }
+
         saveLogoUrl(newLogoUrl);
-        setStatus('Logo updated!', 'success');
-        setupLogo(); // Refresh logo display
+        updateLogoDisplay(newLogoUrl, headerLogo, logoPreview);
+        setStatus('Logo updated successfully!', 'success');
       });
+
+      // Remove logo button
+      document.getElementById('clearLogoBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to remove the logo?')) {
+          saveLogoUrl('');
+          headerLogo.style.display = 'none';
+          headerLogo.src = '';
+          headerLogo.classList.remove('broken');
+          logoUrlInput.value = '';
+          logoPreview.innerHTML = '';
+          setStatus('Logo removed successfully!', 'success');
+        }
+      });
+
+      // Preview logo as user types
+      logoUrlInput.addEventListener('input', () => {
+        const url = logoUrlInput.value.trim();
+        if (url) {
+          try {
+            new URL(url);
+            updateLogoPreview(url, logoPreview);
+          } catch (e) {
+            logoPreview.innerHTML = '<div class="logo-error">Invalid URL format</div>';
+          }
+        } else {
+          logoPreview.innerHTML = '';
+        }
+      });
+    }
+
+    function updateLogoDisplay(logoUrl, headerLogo, logoPreview) {
+      // Update header logo
+      headerLogo.src = logoUrl;
+      headerLogo.style.display = 'block';
+      
+      // Handle load error
+      headerLogo.onerror = () => {
+        headerLogo.classList.add('broken');
+        headerLogo.style.display = 'none';
+        logoPreview.innerHTML = '<div class="logo-error">Failed to load image. Please check the URL.</div>';
+      };
+      
+      // Handle successful load
+      headerLogo.onload = () => {
+        headerLogo.classList.remove('broken');
+        headerLogo.style.display = 'block';
+        logoPreview.innerHTML = `<img src="${logoUrl}" alt="Logo Preview">`;
+      };
+    }
+
+    function updateLogoPreview(logoUrl, logoPreview) {
+      const previewImg = document.createElement('img');
+      previewImg.src = logoUrl;
+      previewImg.alt = 'Logo Preview';
+      
+      previewImg.onload = () => {
+        logoPreview.innerHTML = '';
+        logoPreview.appendChild(previewImg);
+      };
+      
+      previewImg.onerror = () => {
+        logoPreview.innerHTML = '<div class="logo-error">Failed to load image preview</div>';
+      };
     }
 
     categorySel.addEventListener('change', () => {
