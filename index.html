@@ -395,7 +395,7 @@
   <header>
     <div class="header-content">
       <div class="logo-title">
-        
+        <img src="" alt="Logo" class="header-logo" id="headerLogo" style="display: none;" />
         <h1>JulineMart SKU Generator</h1>
       </div>
       <div class="header-right">
@@ -542,6 +542,18 @@
       
       
       <div class="card">
+        <h2 class="card-title">Logo Settings</h2>
+        <div class="form-group">
+          <label>Logo URL</label>
+          <input type="text" id="logoUrl" placeholder="https://.../logo.png" />
+        </div>
+        <div class="logo-preview" id="logoPreview"></div>
+        <div class="btn-group">
+          <button class="btn-primary" id="saveLogoBtn">Save Logo</button>
+        </div>
+      </div>
+      
+      <div class="card">
         <h2 class="card-title">Data Management</h2>
         <div class="form-group">
           <label>Cloud Sync Status</label>
@@ -593,11 +605,14 @@
 
     const LS_KEY = 'jm_skus_v1';
     const LS_VENDORS = 'jm_vendor_codes_v1';
+    const LS_LOGO_URL = 'jm_logo_url_v1';
 
     function loadSkus() { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
     function saveSkus(list) { localStorage.setItem(LS_KEY, JSON.stringify(list)); }
     function loadVendors() { return JSON.parse(localStorage.getItem(LS_VENDORS) || '{}'); }
     function saveVendors(map) { localStorage.setItem(LS_VENDORS, JSON.stringify(map)); }
+    function loadLogoUrl() { return localStorage.getItem(LS_LOGO_URL) || ''; }
+    function saveLogoUrl(url) { localStorage.setItem(LS_LOGO_URL, url); }
     
     
 
@@ -1019,6 +1034,29 @@
       pullFromCloud();
     });
 
+    function setupLogo() {
+      const logoUrl = loadLogoUrl();
+      const headerLogo = document.getElementById('headerLogo');
+      const logoUrlInput = document.getElementById('logoUrl');
+      const logoPreview = document.getElementById('logoPreview');
+
+      if (logoUrl) {
+        headerLogo.src = logoUrl;
+        headerLogo.style.display = 'block';
+        logoUrlInput.value = logoUrl;
+        logoPreview.innerHTML = `<img src="${logoUrl}" alt="Logo Preview">`;
+      } else {
+        headerLogo.style.display = 'none';
+      }
+
+      document.getElementById('saveLogoBtn').addEventListener('click', () => {
+        const newLogoUrl = logoUrlInput.value.trim();
+        saveLogoUrl(newLogoUrl);
+        setStatus('Logo updated!', 'success');
+        setupLogo(); // Refresh logo display
+      });
+    }
+
     categorySel.addEventListener('change', () => {
       categoryCode.value = CATEGORY_MAP[categorySel.value] || '';
       refreshSkuField();
@@ -1031,7 +1069,10 @@
     productNumber.addEventListener('input', refreshSkuField);
 
     function printLabel(rec) {
-      const logo = '<div class="company-name">JulineMart</div>';
+      const logoUrl = loadLogoUrl();
+      const logo = logoUrl 
+        ? `<img src="${logoUrl}" alt="Logo" style="max-height: 50px; max-width: 150px; object-fit: contain;">`
+        : '<div class="company-name">JulineMart</div>';
       const sku = String(rec.sku || '').trim();
       const url = (rec.product_url && rec.product_url.trim()) ? rec.product_url.trim() : `https://julinemart.com/p/${sku}`;
       const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
@@ -1260,6 +1301,7 @@
     })();
 
     (function init() {
+      setupLogo();
       populateCategories();
       renderTable();
       pullFromCloud().then(() => {
