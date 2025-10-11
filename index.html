@@ -550,6 +550,13 @@
             <div style="color: var(--text-light); font-size: 13px;">PNG, JPG or SVG (max 2MB)</div>
           </div>
           <div class="logo-preview" id="logoPreview"></div>
+          <div style="margin-top: 16px;">
+            <label for="logoUrl" style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--text);">Or upload from URL</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="url" id="logoUrl" placeholder="https://example.com/logo.png" style="flex-grow: 1;">
+              <button class="btn-secondary btn-small" id="uploadFromUrlBtn">Upload</button>
+            </div>
+          </div>
         </div>
         
         <div class="btn-group">
@@ -1095,6 +1102,41 @@
         logoFile.value = '';
       };
       reader.readAsDataURL(f);
+    });
+
+    document.getElementById('uploadFromUrlBtn').addEventListener('click', async () => {
+      const url = document.getElementById('logoUrl').value.trim();
+      if (!url) {
+        setStatus('Please enter a valid image URL.', 'error');
+        return;
+      }
+
+      setStatus('Downloading image...', '');
+
+      try {
+        const response = await fetch(`/.netlify/functions/fetch-image?url=${encodeURIComponent(url)}`);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch image: ${errorText}`);
+        }
+        
+        const dataUrl = await response.text();
+
+        if (dataUrl.length > 2 * 1024 * 1024 * 1.4) { // Base64 is larger than binary, check against a safe margin
+          alert('File too large. Max 2MB');
+          setStatus('Image is too large. Maximum size is 2MB.', 'error');
+          return;
+        }
+
+        saveLogo(dataUrl);
+        setStatus('Logo saved and synced from URL', 'success');
+        document.getElementById('logoUrl').value = '';
+
+      } catch (error) {
+        console.error('Error uploading from URL:', error);
+        setStatus(`Failed to upload from URL: ${error.message}`, 'error');
+      }
     });
 
     document.getElementById('removeLogo').addEventListener('click', () => {
