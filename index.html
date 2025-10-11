@@ -395,7 +395,7 @@
   <header>
     <div class="header-content">
       <div class="logo-title">
-        <img id="headerLogo" class="header-logo" style="display:none" alt="Logo">
+        
         <h1>JulineMart SKU Generator</h1>
       </div>
       <div class="header-right">
@@ -539,30 +539,7 @@
     </section>
 
     <section class="page" id="page-settings">
-      <div class="card">
-        <h2 class="card-title">Branding</h2>
-        <div class="form-group">
-          <label>Company Logo</label>
-          <div class="file-upload" id="logoUploadArea">
-            <input type="file" id="logoFile" accept="image/*">
-            <svg style="margin: 0 auto 12px; display: block;" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-            <div style="color: var(--text); font-weight: 500; margin-bottom: 4px;">Click to upload logo</div>
-            <div style="color: var(--text-light); font-size: 13px;">PNG, JPG or SVG (max 2MB)</div>
-          </div>
-          <div class="logo-preview" id="logoPreview"></div>
-          <div style="margin-top: 16px;">
-            <label for="logoUrl" style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--text);">Or upload from URL</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="url" id="logoUrl" placeholder="https://example.com/logo.png" style="flex-grow: 1;">
-              <button class="btn-secondary btn-small" id="uploadFromUrlBtn">Upload</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="btn-group">
-          <button class="btn-danger" id="removeLogo" style="display:none;">Remove Logo</button>
-        </div>
-      </div>
+      
       
       <div class="card">
         <h2 class="card-title">Data Management</h2>
@@ -622,24 +599,7 @@
     function loadVendors() { return JSON.parse(localStorage.getItem(LS_VENDORS) || '{}'); }
     function saveVendors(map) { localStorage.setItem(LS_VENDORS, JSON.stringify(map)); }
     
-    async function saveLogo(dataurl) {
-      try {
-        await fetch('/.netlify/functions/upload-logo', { method: 'POST', body: dataurl });
-        updateLogoDisplay(dataurl);
-      } catch (e) {
-        console.error('Logo upload failed:', e);
-        setStatus('Logo sync failed. Please try again.', 'error');
-      }
-    }
-    async function removeLogo() {
-      try {
-        await fetch('/.netlify/functions/delete-logo', { method: 'POST' });
-        updateLogoDisplay('');
-      } catch (e) {
-        console.error('Logo removal failed:', e);
-        setStatus('Logo removal failed. Please try again.', 'error');
-      }
-    }
+    
 
     function normalizeCode(s) { return (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0,3); }
     function numberTo3(n) { return String(n).padStart(3, '0'); }
@@ -685,37 +645,7 @@
       return data||[]; 
     }
 
-    async function fetchLogoFromCloud() {
-      try {
-        const response = await fetch('/.netlify/functions/get-logo');
-        if (response.ok) {
-          const dataurl = await response.text();
-          updateLogoDisplay(dataurl);
-        } else {
-          updateLogoDisplay('');
-        }
-      } catch (e) {
-        console.warn('Logo fetch not available:', e.message);
-        updateLogoDisplay('');
-      }
-    }
-
-    function updateLogoDisplay(logo) {
-      const headerLogo = document.getElementById('headerLogo');
-      const logoPreview = document.getElementById('logoPreview');
-      const removeBtn = document.getElementById('removeLogo');
-      
-      if (logo) {
-        headerLogo.src = logo;
-        headerLogo.style.display = 'block';
-        logoPreview.innerHTML = `<img src="${logo}" alt="Company Logo">`;
-        removeBtn.style.display = 'inline-flex';
-      } else {
-        headerLogo.style.display = 'none';
-        logoPreview.innerHTML = '';
-        removeBtn.style.display = 'none';
-      }
-    }
+    
 
     async function pullFromCloud(){
       try {
@@ -1083,72 +1013,10 @@
       document.getElementById('csvFile').value = '';
     });
 
-    const logoUploadArea = document.getElementById('logoUploadArea');
-    const logoFile = document.getElementById('logoFile');
     
-    logoUploadArea.addEventListener('click', () => logoFile.click());
-    
-    logoFile.addEventListener('change', () => {
-      const f = logoFile.files[0];
-      if (!f) return;
-      if (f.size > 2 * 1024 * 1024) {
-        alert('File too large. Max 2MB');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        saveLogo(reader.result);
-        setStatus('Logo saved and synced', 'success');
-        logoFile.value = '';
-      };
-      reader.readAsDataURL(f);
-    });
-
-    document.getElementById('uploadFromUrlBtn').addEventListener('click', async () => {
-      const url = document.getElementById('logoUrl').value.trim();
-      if (!url) {
-        setStatus('Please enter a valid image URL.', 'error');
-        return;
-      }
-
-      setStatus('Downloading image...', '');
-
-      try {
-        const response = await fetch(`/.netlify/functions/fetch-image?url=${encodeURIComponent(url)}`);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch image: ${errorText}`);
-        }
-        
-        const dataUrl = await response.text();
-
-        if (dataUrl.length > 2 * 1024 * 1024 * 1.4) { // Base64 is larger than binary, check against a safe margin
-          alert('File too large. Max 2MB');
-          setStatus('Image is too large. Maximum size is 2MB.', 'error');
-          return;
-        }
-
-        saveLogo(dataUrl);
-        setStatus('Logo saved and synced from URL', 'success');
-        document.getElementById('logoUrl').value = '';
-
-      } catch (error) {
-        console.error('Error uploading from URL:', error);
-        setStatus(`Failed to upload from URL: ${error.message}`, 'error');
-      }
-    });
-
-    document.getElementById('removeLogo').addEventListener('click', () => {
-      if (confirm('Remove logo from all devices?')) {
-        removeLogo();
-        setStatus('Logo removed', 'success');
-      }
-    });
 
     document.getElementById('forceSyncBtn').addEventListener('click', () => {
       pullFromCloud();
-      fetchLogoFromCloud();
     });
 
     categorySel.addEventListener('change', () => {
@@ -1163,8 +1031,7 @@
     productNumber.addEventListener('input', refreshSkuField);
 
     function printLabel(rec) {
-      const logoImg = document.getElementById('headerLogo').src;
-      const logo = logoImg ? `<img src="${logoImg}" alt="Logo">` : '<div class="company-name">JulineMart</div>';
+      const logo = '<div class="company-name">JulineMart</div>';
       const sku = String(rec.sku || '').trim();
       const url = (rec.product_url && rec.product_url.trim()) ? rec.product_url.trim() : `https://julinemart.com/p/${sku}`;
       const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url);
@@ -1395,7 +1262,6 @@
     (function init() {
       populateCategories();
       renderTable();
-      fetchLogoFromCloud();
       pullFromCloud().then(() => {
         const sb = getSupabase();
         if (sb) {
