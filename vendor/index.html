@@ -665,15 +665,17 @@
       }
     }
 
-    // Initialize logo manager for vendor portal
-    (async () => {
-      await logoManager.init({
-        logoElementId: 'headerLogo',
-        titleElementId: 'headerTitle',
-        fallbackText: '🏪 Vendor Portal',
-        pageType: 'Vendor Portal'
-      });
-    })();
+    // Initialize logo manager (synchronous version)
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    logoManager.init({
+      logoElementId: 'headerLogo',
+      titleElementId: 'headerTitle',
+      fallbackText: '🏪 Vendor Portal',
+      pageType: 'Vendor Portal'
+    });
+  }, 100);
+});
 
     // Initialize on page load
     async function initialize() {
