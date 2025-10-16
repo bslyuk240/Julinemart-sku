@@ -1456,13 +1456,17 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     await logoManager.setSiteTitle(newSiteTitle);
     await logoManager.setLogoUrl(newLogoUrl);
     
-    // Reinitialize logo display
-    await logoManager.init({
-      logoElementId: 'headerLogo',
-      titleElementId: 'headerTitle',
-      fallbackText: '👨‍💼 Admin Portal',
-      pageType: 'Admin Dashboard'
-    });
+    (async function init() {
+  // Initialize logo
+  await logoManager.init({
+    logoElementId: 'headerLogo',
+    titleElementId: 'headerTitle',
+    fallbackText: '👨‍💼 Admin Portal',
+    pageType: 'Admin Dashboard'
+  });
+  setupSiteSettings();
+  // ... rest of init code
+})();
     
     if (newLogoUrl) {
       updateLogoPreview(newLogoUrl, logoPreview);
