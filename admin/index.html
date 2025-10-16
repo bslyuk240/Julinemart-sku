@@ -946,29 +946,69 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   try {
     const sku = buildSku(cat, ven, num);
     const list = loadSkus();
-    const existing = list.findIndex(x => x.category_code === cat && x.vendor_code === ven && x.number === num);
+    
+    // Check if this exact SKU already exists
+    const existingIndex = list.findIndex(x => 
+      x.category_code === cat && 
+      x.vendor_code === ven && 
+      x.number === num
+    );
+    const isUpdating = existingIndex >= 0;
+    
+    // Check if vendor has auth account by checking Supabase
+    let needsAuth = false;
+    try {
+      const sb = getSupabase();
+      if (sb) {
+        // Check if this email already has an auth user
+        const { data: existingVendor } = await sb
+          .from('vendors')
+          .select('email')
+          .eq('vendor_code', ven)
+          .maybeSingle();
+        
+        // Check if email is placeholder or if vendor has no email at all
+        const isPlaceholderEmail = !existingVendor || 
+                                    !existingVendor.email || 
+                                    existingVendor.email.includes('@vendor.com') ||
+                                    existingVendor.email.includes('placeholder');
+        
+        // Need auth if: no vendor record, placeholder email, or email is changing to real one
+        if (isPlaceholderEmail || 
+            (existingVendor && existingVendor.email !== vendorEmail)) {
+          needsAuth = true;
+          console.log('🔐 Vendor needs auth setup - will create user and send email');
+        } else {
+          console.log('✅ Vendor already has auth account with this email');
+        }
+      }
+    } catch (checkError) {
+      console.warn('⚠️ Could not check vendor auth status:', checkError);
+      // If we can't check, assume they need auth
+      needsAuth = true;
+    }
+
     const now = new Date().toISOString();
 
-    // Check if this is the vendor's first SKU
-    const vendorSkuCount = list.filter(x => x.vendor_code === ven).length;
-    const isFirstSku = vendorSkuCount === 0;
-
-    console.log(`📊 Vendor ${ven} currently has ${vendorSkuCount} SKU(s)`);
-
-    if (existing >= 0) {
-      // Updating existing SKU - no need to create vendor or send email
-      list[existing] = {
-        ...list[existing],
+    if (isUpdating) {
+      // Updating existing SKU
+      console.log('📝 Updating existing SKU');
+      list[existingIndex] = {
+        ...list[existingIndex],
         product_name: pname,
         vendor_name: vName,
         product_url: purl,
         updated_at: now
       };
       saveSkus(list);
+      cloudUpsert(list[existingIndex]);
+      
       setStatus(`✅ Updated SKU: ${sku}`, 'success');
-      cloudUpsert(list[existing]);
+      
     } else {
       // Creating new SKU
+      console.log('➕ Creating new SKU');
+      
       const rec = {
         sku,
         category_code: cat,
@@ -981,25 +1021,30 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         created_at: now,
         updated_at: now
       };
+      
       list.push(rec);
       saveSkus(list);
       cloudUpsert(rec);
       
       let successMsg = `✅ Created SKU: ${sku}`;
       
-      // Only create vendor auth and send email for FIRST SKU
-      if (isFirstSku) {
-        console.log('🆕 First SKU for vendor - creating auth account');
+      // Create vendor auth if needed (real email, not placeholder)
+      if (needsAuth && !vendorEmail.includes('@vendor.com') && !vendorEmail.includes('placeholder')) {
+        console.log('🆕 Creating/updating vendor auth account');
         
         try {
           const vendorResult = await vendorManager.createVendorWithAuth(ven, vName, vendorEmail);
           
           if (vendorResult.isNewVendor) {
             successMsg += ` • New vendor "${vName}" created`;
+          } else {
+            successMsg += ` • Vendor "${vName}" updated`;
           }
+          
           if (vendorResult.authCreated) {
             successMsg += ` • Auth account created`;
           }
+          
           if (vendorResult.emailSent) {
             successMsg += ` • 📧 Invitation email sent to ${vendorEmail}`;
           }
@@ -1008,33 +1053,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
           console.error('⚠️ Vendor creation warning:', error);
           successMsg += ` • ⚠️ SKU saved but vendor setup had issues`;
         }
-      } else {
-        console.log('➕ Additional SKU for existing vendor - no email sent');
+      } else if (!needsAuth) {
         successMsg += ` • Vendor "${vName}" already has account`;
-        
-        // Still ensure vendor record exists in database (without sending email)
-        try {
-          const sb = getSupabase();
-          const { data: existingVendor } = await sb
-            .from('vendors')
-            .select('id')
-            .eq('vendor_code', ven)
-            .maybeSingle();
-          
-          if (!existingVendor) {
-            // Vendor doesn't exist in database, create it
-            await sb.from('vendors').insert([{
-              vendor_code: ven,
-              vendor_name: vName,
-              email: vendorEmail,
-              created_at: now,
-              updated_at: now
-            }]);
-            console.log('📝 Created vendor database record');
-          }
-        } catch (dbError) {
-          console.warn('⚠️ Vendor database update warning:', dbError);
-        }
       }
       
       setStatus(successMsg, 'success');
