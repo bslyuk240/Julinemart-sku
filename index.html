@@ -492,13 +492,15 @@
       });
     }
 
-    // Initialize logo
-    logoManager.init({
-      logoElementId: 'headerLogo',
-      titleElementId: 'headerTitle',
-      fallbackText: 'JulineMart',
-      pageType: ''
-    });
+    // Initialize logo manager
+    (async () => {
+      await logoManager.init({
+        logoElementId: 'headerLogo',
+        titleElementId: 'headerTitle',
+        fallbackText: 'JulineMart',
+        pageType: ''
+      });
+    })();
   </script>
 </body>
 </html>
