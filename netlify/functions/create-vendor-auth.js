@@ -80,8 +80,8 @@ exports.handler = async function(event) {
     let userId = null;
     let userExists = false;
 
-    // Step 1: Try to create user directly
-    console.log('➕ Creating new user:', email);
+    // Step 1: Try to create user
+    console.log('➕ Attempting to create user:', email);
     
     try {
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -96,9 +96,13 @@ exports.handler = async function(event) {
 
       if (createError) {
         // Check if user already exists
-        if (createError.message.includes('already registered') || createError.message.includes('already exists')) {
+        if (createError.message.includes('already registered') || 
+            createError.message.includes('already been registered') ||
+            createError.message.includes('already exists') ||
+            createError.code === 'user_already_exists') {
           console.log('ℹ️ User already exists, will send password reset');
           userExists = true;
+          // Don't throw error, continue to password reset
         } else {
           throw new Error(`Failed to create auth user: ${createError.message}`);
         }
@@ -111,31 +115,34 @@ exports.handler = async function(event) {
       console.error('❌ Exception in user creation:', createError.message);
       
       // Check if it's a duplicate user error
-      if (createError.message.includes('already registered') || createError.message.includes('already exists')) {
-        console.log('ℹ️ User already exists, will send password reset');
+      if (createError.message.includes('already registered') || 
+          createError.message.includes('already been registered') ||
+          createError.message.includes('already exists')) {
+        console.log('ℹ️ User already exists (caught in exception), will send password reset');
         userExists = true;
+        // Don't throw error, continue to password reset
       } else {
         throw createError;
       }
     }
 
-    // Step 2: Generate and send password reset link
-    console.log('📧 Generating password reset link...');
+    // Step 2: Send password reset email (for both new and existing users)
+    console.log('📧 Sending password reset email...');
     
     try {
-      const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email: email.toLowerCase(),
-        options: {
+      const { data: resetData, error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
+        email.toLowerCase(),
+        {
           redirectTo: `${SITE_URL}/vendor/reset-password.html`
         }
-      });
+      );
 
       if (resetError) {
-        console.error('❌ Password reset link generation error:', resetError.message);
+        console.error('❌ Password reset email error:', resetError.message);
+        console.error('Error details:', resetError);
         emailSent = false;
       } else {
-        console.log('✅ Password reset link generated');
+        console.log('✅ Password reset email sent');
         emailSent = true;
       }
     } catch (resetError) {
@@ -150,6 +157,7 @@ exports.handler = async function(event) {
       vendor_name: vendor_name,
       email: email.toLowerCase(),
       authCreated: authCreated,
+      userExists: userExists,
       emailSent: emailSent,
       userId: userId,
       redirectUrl: `${SITE_URL}/vendor/reset-password.html`,
@@ -157,7 +165,7 @@ exports.handler = async function(event) {
         ? (emailSent 
             ? `✅ New vendor created and invitation email sent to ${email}` 
             : `⚠️ Vendor created but email failed - check Supabase email settings`)
-        : (emailSent
+        : (userExists && emailSent
             ? `✅ Vendor already exists, password reset email sent to ${email}`
             : `⚠️ Vendor exists but email failed - check Supabase email settings`)
     };
