@@ -1429,57 +1429,69 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
       }
 
       // Save settings button
-      document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-        const newSiteTitle = siteTitleInput.value.trim();
-        const newLogoUrl = logoUrlInput.value.trim();
-        
-        // Save site title (can be empty)
-        logoManager.setSiteTitle(newSiteTitle);
-        
-        if (newLogoUrl) {
-          // Validate URL format if provided
-          try {
-            new URL(newLogoUrl);
-          } catch (e) {
-            setStatus('Please enter a valid URL for the logo', 'error');
-            return;
-          }
-          logoManager.setLogoUrl(newLogoUrl);
-        } else {
-          logoManager.setLogoUrl('');
-        }
+document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+  const newSiteTitle = siteTitleInput.value.trim();
+  const newLogoUrl = logoUrlInput.value.trim();
+  
+  // Validate URL format if provided
+  if (newLogoUrl) {
+    try {
+      new URL(newLogoUrl);
+    } catch (e) {
+      setStatus('Please enter a valid URL for the logo', 'error');
+      return;
+    }
+  }
+  
+  setStatus('Saving settings...', 'info');
+  
+  try {
+    // Save to Supabase
+    await logoManager.setSiteTitle(newSiteTitle);
+    await logoManager.setLogoUrl(newLogoUrl);
+    
+    // Reinitialize logo display
+    await logoManager.init({
+      logoElementId: 'headerLogo',
+      titleElementId: 'headerTitle',
+      fallbackText: '👨‍💼 Admin Portal',
+      pageType: 'Admin Dashboard'
+    });
+    
+    if (newLogoUrl) {
+      updateLogoPreview(newLogoUrl, logoPreview);
+    } else {
+      logoPreview.innerHTML = '';
+    }
+    
+    setStatus('✅ Settings saved successfully! All users will see the changes.', 'success');
+    
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    setStatus('❌ Failed to save settings. Please try again.', 'error');
+  }
+});
 
-        logoManager.init({
-          logoElementId: 'headerLogo',
-          titleElementId: 'headerTitle',
-          fallbackText: '👨‍💼 Admin Portal',
-          pageType: 'Admin Dashboard'
-        });
-        
-        if (newLogoUrl) {
-          updateLogoPreview(newLogoUrl, logoPreview);
-        } else {
-          logoPreview.innerHTML = '';
-        }
-        
-        setStatus('Settings saved successfully!', 'success');
+// Remove logo button
+document.getElementById('clearLogoBtn').addEventListener('click', async () => {
+  if (confirm('Are you sure you want to remove the logo?')) {
+    try {
+      await logoManager.setLogoUrl('');
+      await logoManager.init({
+        logoElementId: 'headerLogo',
+        titleElementId: 'headerTitle',
+        fallbackText: '👨‍💼 Admin Portal',
+        pageType: 'Admin Dashboard'
       });
-
-      // Remove logo button
-      document.getElementById('clearLogoBtn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to remove the logo?')) {
-          logoManager.setLogoUrl('');
-          logoManager.init({
-            logoElementId: 'headerLogo',
-            titleElementId: 'headerTitle',
-            fallbackText: '👨‍💼 Admin Portal',
-            pageType: 'Admin Dashboard'
-          });
-          logoUrlInput.value = '';
-          logoPreview.innerHTML = '';
-          setStatus('Logo removed successfully!', 'success');
-        }
-      });
+      logoUrlInput.value = '';
+      logoPreview.innerHTML = '';
+      setStatus('✅ Logo removed successfully!', 'success');
+    } catch (error) {
+      console.error('Error removing logo:', error);
+      setStatus('❌ Failed to remove logo. Please try again.', 'error');
+    }
+  }
+});
 
       // Preview logo as user types
       logoUrlInput.addEventListener('input', () => {
