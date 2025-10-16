@@ -14,3 +14,4 @@ Just open `index.html` in a browser.
 When we enable Supabase sync:
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
+
