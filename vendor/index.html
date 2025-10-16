@@ -665,6 +665,16 @@
       }
     }
 
+    // Initialize logo manager for vendor portal
+    (async () => {
+      await logoManager.init({
+        logoElementId: 'headerLogo',
+        titleElementId: 'headerTitle',
+        fallbackText: '🏪 Vendor Portal',
+        pageType: 'Vendor Portal'
+      });
+    })();
+
     // Initialize on page load
     async function initialize() {
       await initializeLogo();
