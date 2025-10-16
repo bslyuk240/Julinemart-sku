@@ -1416,18 +1416,24 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     })();
 
     // Setup site settings functionality
-    function setupSiteSettings() {
-      const siteTitleInput = document.getElementById('siteTitle');
-      const logoUrlInput = document.getElementById('logoUrl');
-      const logoPreview = document.getElementById('logoPreview');
+async function setupSiteSettings() {
+  const siteTitleInput = document.getElementById('siteTitle');
+  const logoUrlInput = document.getElementById('logoUrl');
+  const logoPreview = document.getElementById('logoPreview');
 
-      // Load current settings
-      siteTitleInput.value = logoManager.getSiteTitle();
-      logoUrlInput.value = logoManager.getLogoUrl();
-      if (logoUrlInput.value) {
-        updateLogoPreview(logoUrlInput.value, logoPreview);
-      }
+  // Load current settings from Supabase
+  const currentTitle = await logoManager.getSiteTitle();
+  const currentLogoUrl = await logoManager.getLogoUrl();
+  
+  siteTitleInput.value = currentTitle;
+  logoUrlInput.value = currentLogoUrl;
+  
+  if (currentLogoUrl) {
+    updateLogoPreview(currentLogoUrl, logoPreview);
+  }
 
+  // ... rest of the code (save buttons, etc)
+}
       // Save settings button
 document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
   const newSiteTitle = siteTitleInput.value.trim();
