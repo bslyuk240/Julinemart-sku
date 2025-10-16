@@ -659,8 +659,8 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
     console.log('📧 Sending password reset to:', email);
     
     const { error } = await getSupabase().auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://sku-test.netlify.app/vendor/reset-password.html'
-    });
+  redirectTo: `${window.location.origin}/vendor/reset-password.html`
+});
     
     if (error) throw error;
     
