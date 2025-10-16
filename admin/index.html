@@ -941,19 +941,22 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     return;
   }
 
-  setStatus('Creating vendor and saving SKU...', 'info');
+  setStatus('Saving SKU...', 'info');
 
   try {
-    // Step 1: Create vendor with authentication if needed
-    const vendorResult = await vendorManager.createVendorWithAuth(ven, vName, vendorEmail);
-    
-    // Step 2: Save the SKU
     const sku = buildSku(cat, ven, num);
     const list = loadSkus();
     const existing = list.findIndex(x => x.category_code === cat && x.vendor_code === ven && x.number === num);
     const now = new Date().toISOString();
 
+    // Check if this is the vendor's first SKU
+    const vendorSkuCount = list.filter(x => x.vendor_code === ven).length;
+    const isFirstSku = vendorSkuCount === 0;
+
+    console.log(`📊 Vendor ${ven} currently has ${vendorSkuCount} SKU(s)`);
+
     if (existing >= 0) {
+      // Updating existing SKU - no need to create vendor or send email
       list[existing] = {
         ...list[existing],
         product_name: pname,
@@ -962,9 +965,10 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         updated_at: now
       };
       saveSkus(list);
-      setStatus(`Updated SKU: ${sku}`, 'success');
+      setStatus(`✅ Updated SKU: ${sku}`, 'success');
       cloudUpsert(list[existing]);
     } else {
+      // Creating new SKU
       const rec = {
         sku,
         category_code: cat,
@@ -981,16 +985,56 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
       saveSkus(list);
       cloudUpsert(rec);
       
-      // Show success message with vendor creation info
-      let successMsg = `Created SKU: ${sku}`;
-      if (vendorResult.isNewVendor) {
-        successMsg += ` • New vendor "${vName}" created`;
-      }
-      if (vendorResult.authCreated) {
-        successMsg += ` • Auth account created`;
-      }
-      if (vendorResult.emailSent) {
-        successMsg += ` • Invitation email sent to ${vendorEmail}`;
+      let successMsg = `✅ Created SKU: ${sku}`;
+      
+      // Only create vendor auth and send email for FIRST SKU
+      if (isFirstSku) {
+        console.log('🆕 First SKU for vendor - creating auth account');
+        
+        try {
+          const vendorResult = await vendorManager.createVendorWithAuth(ven, vName, vendorEmail);
+          
+          if (vendorResult.isNewVendor) {
+            successMsg += ` • New vendor "${vName}" created`;
+          }
+          if (vendorResult.authCreated) {
+            successMsg += ` • Auth account created`;
+          }
+          if (vendorResult.emailSent) {
+            successMsg += ` • 📧 Invitation email sent to ${vendorEmail}`;
+          }
+          
+        } catch (error) {
+          console.error('⚠️ Vendor creation warning:', error);
+          successMsg += ` • ⚠️ SKU saved but vendor setup had issues`;
+        }
+      } else {
+        console.log('➕ Additional SKU for existing vendor - no email sent');
+        successMsg += ` • Vendor "${vName}" already has account`;
+        
+        // Still ensure vendor record exists in database (without sending email)
+        try {
+          const sb = getSupabase();
+          const { data: existingVendor } = await sb
+            .from('vendors')
+            .select('id')
+            .eq('vendor_code', ven)
+            .maybeSingle();
+          
+          if (!existingVendor) {
+            // Vendor doesn't exist in database, create it
+            await sb.from('vendors').insert([{
+              vendor_code: ven,
+              vendor_name: vName,
+              email: vendorEmail,
+              created_at: now,
+              updated_at: now
+            }]);
+            console.log('📝 Created vendor database record');
+          }
+        } catch (dbError) {
+          console.warn('⚠️ Vendor database update warning:', dbError);
+        }
       }
       
       setStatus(successMsg, 'success');
@@ -1006,14 +1050,10 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     renderTable();
     
   } catch (error) {
-    console.error('Error saving SKU and creating vendor:', error);
+    console.error('❌ Error saving SKU:', error);
     let errorMsg = 'Failed to save SKU';
     
-    if (error.message.includes('User already registered')) {
-      errorMsg = 'SKU saved, but vendor email is already registered with a different account';
-    } else if (error.message.includes('duplicate key')) {
-      errorMsg = 'This vendor code already exists with a different email';
-    } else if (error.message) {
+    if (error.message) {
       errorMsg += ': ' + error.message;
     }
     
