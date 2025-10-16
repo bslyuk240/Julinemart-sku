@@ -1432,107 +1432,101 @@ async function setupSiteSettings() {
     updateLogoPreview(currentLogoUrl, logoPreview);
   }
 
-  // ... rest of the code (save buttons, etc)
-}
-      // Save settings button
-document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-  const newSiteTitle = siteTitleInput.value.trim();
-  const newLogoUrl = logoUrlInput.value.trim();
-  
-  // Validate URL format if provided
-  if (newLogoUrl) {
-    try {
-      new URL(newLogoUrl);
-    } catch (e) {
-      setStatus('Please enter a valid URL for the logo', 'error');
-      return;
-    }
-  }
-  
-  setStatus('Saving settings...', 'info');
-  
-  try {
-    // Save to Supabase
-    await logoManager.setSiteTitle(newSiteTitle);
-    await logoManager.setLogoUrl(newLogoUrl);
+  // Save settings button
+  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+    const newSiteTitle = siteTitleInput.value.trim();
+    const newLogoUrl = logoUrlInput.value.trim();
     
-    (async function init() {
-  // Initialize logo
-  await logoManager.init({
-    logoElementId: 'headerLogo',
-    titleElementId: 'headerTitle',
-    fallbackText: '👨‍💼 Admin Portal',
-    pageType: 'Admin Dashboard'
-  });
-  setupSiteSettings();
-  // ... rest of init code
-})();
-    
+    // Validate URL format if provided
     if (newLogoUrl) {
-      updateLogoPreview(newLogoUrl, logoPreview);
-    } else {
-      logoPreview.innerHTML = '';
+      try {
+        new URL(newLogoUrl);
+      } catch (e) {
+        setStatus('Please enter a valid URL for the logo', 'error');
+        return;
+      }
     }
     
-    setStatus('✅ Settings saved successfully! All users will see the changes.', 'success');
+    setStatus('Saving settings...', 'info');
     
-  } catch (error) {
-    console.error('Error saving settings:', error);
-    setStatus('❌ Failed to save settings. Please try again.', 'error');
-  }
-});
-
-// Remove logo button
-document.getElementById('clearLogoBtn').addEventListener('click', async () => {
-  if (confirm('Are you sure you want to remove the logo?')) {
     try {
-      await logoManager.setLogoUrl('');
+      // Save to Supabase
+      await logoManager.setSiteTitle(newSiteTitle);
+      await logoManager.setLogoUrl(newLogoUrl);
+      
+      // Reinitialize logo display
       await logoManager.init({
         logoElementId: 'headerLogo',
         titleElementId: 'headerTitle',
         fallbackText: '👨‍💼 Admin Portal',
         pageType: 'Admin Dashboard'
       });
-      logoUrlInput.value = '';
-      logoPreview.innerHTML = '';
-      setStatus('✅ Logo removed successfully!', 'success');
-    } catch (error) {
-      console.error('Error removing logo:', error);
-      setStatus('❌ Failed to remove logo. Please try again.', 'error');
-    }
-  }
-});
-
-      // Preview logo as user types
-      logoUrlInput.addEventListener('input', () => {
-        const url = logoUrlInput.value.trim();
-        if (url) {
-          try {
-            new URL(url);
-            updateLogoPreview(url, logoPreview);
-          } catch (e) {
-            logoPreview.innerHTML = '<div class="logo-error">Invalid URL format</div>';
-          }
-        } else {
-          logoPreview.innerHTML = '';
-        }
-      });
-    }
-
-    function updateLogoPreview(logoUrl, logoPreview) {
-      const previewImg = document.createElement('img');
-      previewImg.src = logoUrl;
-      previewImg.alt = 'Logo Preview';
       
-      previewImg.onload = () => {
+      if (newLogoUrl) {
+        updateLogoPreview(newLogoUrl, logoPreview);
+      } else {
         logoPreview.innerHTML = '';
-        logoPreview.appendChild(previewImg);
-      };
+      }
       
-      previewImg.onerror = () => {
-        logoPreview.innerHTML = '<div class="logo-error">Failed to load image preview</div>';
-      };
+      setStatus('✅ Settings saved successfully! All users will see the changes.', 'success');
+      
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setStatus('❌ Failed to save settings. Please try again.', 'error');
     }
+  });
+
+  // Remove logo button
+  document.getElementById('clearLogoBtn').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to remove the logo?')) {
+      try {
+        await logoManager.setLogoUrl('');
+        await logoManager.init({
+          logoElementId: 'headerLogo',
+          titleElementId: 'headerTitle',
+          fallbackText: '👨‍💼 Admin Portal',
+          pageType: 'Admin Dashboard'
+        });
+        logoUrlInput.value = '';
+        logoPreview.innerHTML = '';
+        setStatus('✅ Logo removed successfully!', 'success');
+      } catch (error) {
+        console.error('Error removing logo:', error);
+        setStatus('❌ Failed to remove logo. Please try again.', 'error');
+      }
+    }
+  });
+
+  // Preview logo as user types
+  logoUrlInput.addEventListener('input', () => {
+    const url = logoUrlInput.value.trim();
+    if (url) {
+      try {
+        new URL(url);
+        updateLogoPreview(url, logoPreview);
+      } catch (e) {
+        logoPreview.innerHTML = '<div class="logo-error">Invalid URL format</div>';
+      }
+    } else {
+      logoPreview.innerHTML = '';
+    }
+  });
+}
+
+function updateLogoPreview(logoUrl, logoPreview) {
+  const previewImg = document.createElement('img');
+  previewImg.src = logoUrl;
+  previewImg.alt = 'Logo Preview';
+  
+  previewImg.onload = () => {
+    logoPreview.innerHTML = '';
+    logoPreview.appendChild(previewImg);
+  };
+  
+  previewImg.onerror = () => {
+    logoPreview.innerHTML = '<div class="logo-error">Failed to load image preview</div>';
+  };
+}
 
     categorySel.addEventListener('change', () => {
       categoryCode.value = CATEGORY_MAP[categorySel.value] || '';
