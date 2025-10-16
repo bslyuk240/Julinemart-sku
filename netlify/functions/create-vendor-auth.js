@@ -5,7 +5,13 @@ const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SITE_URL = process.env.SITE_URL || 'https://sku.julinemart.com';
+// Detect the site URL dynamically from the request
+const SITE_URL = process.env.SITE_URL || 
+                 process.env.URL || 
+                 process.env.DEPLOY_PRIME_URL || 
+                 'https://sku.julinemart.com';
+
+console.log('🌐 Using SITE_URL:', SITE_URL);
 
 // Validate environment variables
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
