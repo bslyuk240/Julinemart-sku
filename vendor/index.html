@@ -24,6 +24,8 @@
     header { background: linear-gradient(135deg, var(--orange) 0%, var(--orange-hover) 100%); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
     .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-logo { display: flex; align-items: center; gap: 12px; }
+    .logo-img { height: 32px; width: auto; object-fit: contain; }
     .vendor-badge { background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
     .logout-btn { padding: 8px 20px; background: rgba(255,255,255,0.2); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
     .logout-btn:hover { background: rgba(255,255,255,0.3); }
@@ -65,7 +67,10 @@
   <header>
     <div class="header-content">
       <div class="header-left">
-        <h1>🏪 Vendor Portal</h1>
+        <div class="header-logo">
+          <img src="" alt="Logo" class="logo-img" id="headerLogo" style="display: none;" />
+          <h1 id="headerTitle">🏪 Vendor Portal</h1>
+        </div>
         <div class="vendor-badge" id="vendorBadge">Loading...</div>
       </div>
       <button class="logout-btn" onclick="logout()">Logout</button>
@@ -139,12 +144,26 @@
     let allProducts = [];
     let filteredProducts = [];
 
+    // Initialize logo manager properly
+    async function initializeLogo() {
+      try {
+        await logoManager.init({
+          logoElementId: 'headerLogo',
+          titleElementId: 'headerTitle',
+          fallbackText: '🏪 Vendor Portal',
+          pageType: 'Vendor Portal'
+        });
+      } catch (error) {
+        console.error('Logo initialization error:', error);
+      }
+    }
+
     // Check authentication on page load
     async function checkAuth() {
       const { data: { session } } = await sb.auth.getSession();
       
       if (!session) {
-        console.log('❌ No active session, redirecting to login...');
+        console.log('⌛ No active session, redirecting to login...');
         localStorage.clear();
         window.location.href = '../index.html';
         return false;
@@ -209,7 +228,7 @@
           .order('sku', { ascending: true });
 
         if (skuError) {
-          console.error('❌ SKU fetch error:', skuError);
+          console.error('⌛ SKU fetch error:', skuError);
           throw new Error(`Failed to load products: ${skuError.message}`);
         }
 
@@ -254,7 +273,7 @@
         updateStats();
 
       } catch (err) {
-        console.error('❌ Error loading products:', err);
+        console.error('⌛ Error loading products:', err);
         showError(`${err.message}. Please refresh the page or contact support.`);
         document.getElementById('productsTable').innerHTML = 
           `<tr><td colspan="7"><div class="empty-state">
@@ -383,7 +402,7 @@
     async function saveChanges(sku, btnElement) {
       const product = allProducts.find(p => p.sku === sku);
       if (!product) {
-        alert('❌ Product not found');
+        alert('⌛ Product not found');
         return;
       }
       
@@ -408,7 +427,7 @@
           });
         
         if (error) {
-          console.error('❌ Save error:', error);
+          console.error('⌛ Save error:', error);
           throw new Error(error.message);
         }
         
@@ -424,30 +443,23 @@
         }, 2000);
         
       } catch (e) {
-        console.error('❌ Save error:', e);
-        alert(`❌ Error saving changes for ${sku}:\n${e.message}`);
+        console.error('⌛ Save error:', e);
+        alert(`⌛ Error saving changes for ${sku}:\n${e.message}`);
         btnElement.textContent = originalText;
         btnElement.disabled = false;
       }
     }
 
-    // Initialize logo manager (synchronous version)
-window.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    logoManager.init({
-      logoElementId: 'headerLogo',
-      titleElementId: 'headerTitle',
-      fallbackText: '🏪 Vendor Portal',
-      pageType: 'Vendor Portal'
-    });
-  }, 100);
-});
-
     // Initialize on page load
+    async function initialize() {
+      await initializeLogo();
+      await loadProducts();
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadProducts);
+      document.addEventListener('DOMContentLoaded', initialize);
     } else {
-      loadProducts();
+      initialize();
     }
   </script>
 </body>
