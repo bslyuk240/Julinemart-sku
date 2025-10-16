@@ -53,7 +53,7 @@ const vendorManager = {
       
       // Step 2: Create or update vendor record in database
       if (existingVendor) {
-        console.log('📝 Vendor exists, updating...');
+        console.log('📝 Vendor exists, updating email if needed...');
         // Vendor exists, update if email changed
         if (existingVendor.email !== email.toLowerCase() && email) {
           await this.supabase
@@ -79,7 +79,6 @@ const vendorManager = {
           }]);
         
         if (insertError) {
-          // Check if it's a duplicate key error
           if (insertError.code === '23505') {
             console.log('⚠️ Vendor already exists, continuing...');
           } else {
@@ -91,7 +90,6 @@ const vendorManager = {
       }
       
       // Step 3: Create auth account via Netlify function
-      // This requires service role key, so we use a serverless function
       if (email) {
         console.log('🔐 Creating auth account via Netlify function...');
         
@@ -108,21 +106,25 @@ const vendorManager = {
             })
           });
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ Auth creation failed:', errorData);
-            throw new Error(errorData.error || 'Failed to create auth account');
-          }
-
           const authResult = await response.json();
           console.log('✅ Auth result:', authResult);
           
-          result.authCreated = authResult.authCreated;
-          result.emailSent = authResult.emailSent;
+          // Check if the response was successful (even if user exists)
+          if (response.ok && authResult.success) {
+            result.authCreated = authResult.authCreated;
+            result.emailSent = authResult.emailSent;
+            
+            // If user already existed, that's okay - we still got a success response
+            if (authResult.userExists) {
+              console.log('ℹ️ User already existed, password reset sent');
+            }
+          } else {
+            console.error('❌ Auth creation failed:', authResult);
+            result.error = authResult.error || 'Failed to create auth account';
+          }
           
         } catch (authError) {
           console.error('❌ Auth error:', authError);
-          // Don't fail the whole operation if auth fails
           result.error = 'Vendor created but auth setup failed: ' + authError.message;
         }
       }
@@ -147,7 +149,7 @@ const vendorManager = {
       const { error } = await this.supabase.auth.resetPasswordForEmail(
         email.toLowerCase(),
         {
-          redirectTo: `${window.location.origin}/vendor/index.html`
+          redirectTo: `${window.location.origin}/vendor/reset-password.html`
         }
       );
       
