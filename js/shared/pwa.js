@@ -2,6 +2,7 @@
   'use strict';
 
   const LOGO_KEY = 'jm_logo_url_v1';
+  const DEFAULT_LOGO_URL = 'https://res.cloudinary.com/dupgdbwrt/image/upload/v1759971092/icon-512x512.png_ygtda9.png';
   const IOS_HINT_KEY = 'jm_pwa_ios_hint_dismissed';
   const INSTALL_HINT_KEY = 'jm_pwa_install_dismissed';
 
@@ -55,47 +56,52 @@
         position: fixed;
         left: 16px;
         right: 16px;
-        bottom: 16px;
-        background: #ffffff;
-        color: #1f2937;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-        padding: 12px 14px;
+        top: 16px;
+        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(45, 27, 105, 0.35);
+        padding: 16px 18px;
         display: none;
         align-items: center;
-        gap: 12px;
-        z-index: 9998;
+        gap: 14px;
+        z-index: 10000;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       }
       #pwa-install-banner.show,
       #pwa-ios-banner.show { display: flex; }
-      .pwa-banner-text { flex: 1; font-size: 13px; line-height: 1.35; }
-      .pwa-banner-title { font-weight: 600; margin-bottom: 2px; }
-      .pwa-banner-actions { display: flex; gap: 8px; }
+      .pwa-banner-text { flex: 1; font-size: 14px; line-height: 1.4; }
+      .pwa-banner-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+      .pwa-banner-actions { display: flex; gap: 10px; }
       .pwa-btn {
         border: none;
-        background: #5b21b6;
-        color: #ffffff;
-        padding: 8px 12px;
-        border-radius: 8px;
+        background: #ffffff;
+        color: #4c1d95;
+        padding: 10px 14px;
+        border-radius: 10px;
         font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
+        box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18);
       }
       .pwa-btn.secondary {
-        background: #f3f4f6;
-        color: #1f2937;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        box-shadow: none;
       }
     `;
 
     document.head.appendChild(style);
   };
 
+  const getLogoUrl = () => {
+    const stored = localStorage.getItem(LOGO_KEY);
+    return stored && /^https?:\/\//i.test(stored) ? stored : DEFAULT_LOGO_URL;
+  };
+
   const updateIcons = () => {
-    const logoUrl = localStorage.getItem(LOGO_KEY);
-    if (!logoUrl || !/^https?:\/\//i.test(logoUrl)) {
-      return;
-    }
+    const logoUrl = getLogoUrl();
 
     const icon = document.getElementById('pwaIcon');
     const appleIcon = document.getElementById('appleTouchIcon');
@@ -117,8 +123,8 @@
     const logoHolder = document.createElement('div');
     logoHolder.className = 'pwa-splash-logo';
 
-    const logoUrl = localStorage.getItem(LOGO_KEY);
-    if (logoUrl && /^https?:\/\//i.test(logoUrl)) {
+    const logoUrl = getLogoUrl();
+    if (logoUrl) {
       const img = document.createElement('img');
       img.src = logoUrl;
       img.alt = 'JulineMart logo';
