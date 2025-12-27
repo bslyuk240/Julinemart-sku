@@ -90,6 +90,35 @@
         color: #ffffff;
         box-shadow: none;
       }
+      #pwa-update-toast {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: calc(env(safe-area-inset-bottom) + 12px);
+        background: #111827;
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 12px 14px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 18px 40px rgba(17, 24, 39, 0.35);
+        z-index: 10002;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+      #pwa-update-toast.show { display: flex; }
+      .pwa-update-text { flex: 1; font-size: 13px; line-height: 1.35; }
+      .pwa-update-title { font-weight: 700; margin-bottom: 2px; }
+      .pwa-update-btn {
+        border: none;
+        background: #ffffff;
+        color: #111827;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
       html.pwa-standalone.pwa-ios body {
         padding-top: 0;
       }
@@ -196,8 +225,26 @@
     sidebars.forEach((sidebar) => {
       const styles = window.getComputedStyle(sidebar);
       const paddingTop = parseFloat(styles.paddingTop) || 0;
-      sidebar.style.paddingTop = `calc(env(safe-area-inset-top) + ${paddingTop}px)`;
+      sidebar.style.paddingTop = `${paddingTop}px`;
+      if (isStandalone()) {
+        const header = document.querySelector('header');
+        if (header) {
+          const headerHeight = header.getBoundingClientRect().height;
+          sidebar.style.top = `${headerHeight}px`;
+          sidebar.style.height = `calc(100% - ${headerHeight}px)`;
+        }
+      }
     });
+  };
+
+  const applySafeAreaToBodyIfNoHeader = () => {
+    if (!isIOS()) {
+      return;
+    }
+    if (document.querySelector('header')) {
+      return;
+    }
+    document.body.style.paddingTop = 'env(safe-area-inset-top)';
   };
 
   const initPullToRefresh = () => {
@@ -354,7 +401,46 @@
     if (!('serviceWorker' in navigator)) {
       return;
     }
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
+      if (registration.waiting) {
+        showUpdateToast(registration);
+      }
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (!newWorker) {
+          return;
+        }
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateToast(registration);
+          }
+        });
+      });
+    }).catch(() => {});
+  };
+
+  const showUpdateToast = (registration) => {
+    if (document.getElementById('pwa-update-toast')) {
+      return;
+    }
+    const toast = document.createElement('div');
+    toast.id = 'pwa-update-toast';
+    toast.className = 'show';
+    toast.innerHTML = `
+      <div class="pwa-update-text">
+        <div class="pwa-update-title">Update available</div>
+        <div>Refresh to load the latest version.</div>
+      </div>
+      <button class="pwa-update-btn" type="button">Refresh</button>
+    `;
+    document.body.appendChild(toast);
+
+    toast.querySelector('.pwa-update-btn').addEventListener('click', () => {
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+      window.location.reload();
+    });
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -369,9 +455,14 @@
     createSplash();
     applySafeAreaToHeaders();
     applySafeAreaToSidebars();
+    applySafeAreaToBodyIfNoHeader();
     initPullToRefresh();
     showIOSBanner();
     registerServiceWorker();
+  });
+
+  navigator.serviceWorker?.addEventListener?.('controllerchange', () => {
+    window.location.reload();
   });
 
   window.addEventListener('beforeinstallprompt', (event) => {
