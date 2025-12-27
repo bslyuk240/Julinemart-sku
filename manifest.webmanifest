@@ -1,0 +1,22 @@
+{
+  "name": "JulineMart",
+  "short_name": "JulineMart",
+  "description": "JulineMart SKU and inventory system",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#2d1b69",
+  "theme_color": "#5b21b6",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dupgdbwrt/image/upload/v1759968430/icon-192.png_fukoim.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://res.cloudinary.com/dupgdbwrt/image/upload/v1759971092/icon-512x512.png_ygtda9.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

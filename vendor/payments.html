@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#5b21b6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JulineMart" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="icon" href="https://res.cloudinary.com/dupgdbwrt/image/upload/v1759971092/icon-512x512.png_ygtda9.png" id="pwaIcon" />
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dupgdbwrt/image/upload/v1759968430/icon-192.png_fukoim.png" id="appleTouchIcon" />
   <title>My Payments - JulineMart Vendor Portal</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1333,6 +1341,7 @@ ${payment.notes ? `\nNotes: ${payment.notes}` : ''}
       }
     }
   </script>
+  <script src="/js/shared/pwa.js"></script>
 </body>
 </html>
 
