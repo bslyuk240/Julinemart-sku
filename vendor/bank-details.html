@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Details - JulineMart Vendor Portal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --secondary: #5b21b6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --bg-gray: #f9fafb;
+      --bg: #fafafa;
+    }
+    
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo img {
+      height: 32px;
+      width: auto;
+    }
+    
+    .vendor-badge {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .sidebar .vendor-badge {
+      background: var(--secondary);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    .portal-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.2);
+      font-size: 14px;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255,255,255,0.3);
+      color: white;
+    }
+    
+    .nav-link.active {
+      background: white;
+      color: var(--primary);
+    }
+    
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .logout-btn:hover {
+      background: #4c1d95;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: var(--secondary);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle:hover {
+      background: #9568d8;
+    }
+
+    .menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 120;
+    }
+
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      transition: right 0.2s ease;
+      z-index: 130;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      gap: 12px;
+    }
+
+    .sidebar-close {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .sidebar-close:hover {
+      background: #4c1d95;
+    }
+
+    .sidebar-link {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font: inherit;
+      font-size: 15px;
+      text-align: left;
+    }
+
+    .sidebar-link.active {
+      background: #fff7ed;
+      color: var(--primary);
+    }
+
+    .sidebar-link.logout {
+      color: var(--secondary);
+      background: rgba(91,33,182,0.12);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .page-header p {
+      color: var(--text-light);
+      font-size: 11px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .info-box {
+      background: #dbeafe;
+      border: 1px solid #60a5fa;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .info-box strong {
+      color: #1e40af;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .info-box ul {
+      margin-left: 20px;
+      color: #1e3a8a;
+    }
+    
+    .bank-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: rgb(255, 255, 255);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .bank-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .bank-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    
+    .primary-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .bank-info {
+      margin-bottom: 16px;
+    }
+    
+    .bank-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .account-number {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    
+    .account-name {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    .bank-card-footer {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-group label .required {
+      color: var(--danger);
+    }
+    
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .form-help {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #4c1d95;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      border: 1px solid var(--secondary);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #4c1d95;
+    }
+    
+    .btn-danger {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+      background: #4c1d95;
+    }
+    
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .portal-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
+  <script src="../js/shared/supabase.js"></script>
+  <script src="../js/shared/logo.js"></script>
+  <script src="../js/shared/payments.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-logo">
+          <img src="" alt="Logo" id="headerLogo" style="display: none;" />
+        </div>
+        <h1 class="header-title" id="headerTitle">Vendor Portal</h1>
+      </div>
+      <nav class="portal-nav">
+        <a href="index.html" class="nav-link">Stock Management</a>
+        <a href="payments.html" class="nav-link">Payments</a>
+        <a href="bank-details.html" class="nav-link active">Bank Details</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="vendor-badge" id="vendorBadge">Loading...</div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu"></button>
+    </div>
+    <a href="index.html" class="sidebar-link">Stock Management</a>
+    <a href="payments.html" class="sidebar-link">Payments</a>
+    <a href="bank-details.html" class="sidebar-link active">Bank Details</a>
+    <button class="sidebar-link logout" onclick="logout()">Logout</button>
+  </aside>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Bank Account Details</h1>
+      <p>Manage your payment account information</p>
+    </div>
+
+    <!-- Existing Bank Accounts -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Your Bank Accounts</h2>
+        <button class="btn btn-primary btn-small" onclick="showAddBankForm()">
+           Add Account
+        </button>
+      </div>
+
+      <div id="bankAccountsList">
+        <div class="empty-state">
+          <div class="empty-state-icon"></div>
+          <h3>Loading bank accounts...</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Bank Account Form -->
+    <div class="card" id="bankForm" style="display: none;">
+      <div class="card-header">
+        <h2 class="card-title" id="formTitle">Add Bank Account</h2>
+        <button class="btn btn-secondary btn-small" onclick="cancelBankForm()">
+          Cancel
+        </button>
+      </div>
+
+      <form id="bankDetailsForm" onsubmit="handleSaveBankDetails(event)">
+        <input type="hidden" id="bankId" />
+
+        <div class="form-group">
+          <label>Bank Name <span class="required">*</span></label>
+          <select class="form-select" id="bankName" required>
+            <option value="">Select your bank...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Account Number <span class="required">*</span></label>
+          <input 
+            type="text" 
+            class="form-input" 
+            id="accountNumber" 
+            required 
+            maxlength="10"
+            pattern="[0-9]{10}"
+            placeholder="0123456789"
+          />
+          <div class="form-help">Enter your 10-digit account number</div>
+        </div>
+
+        <div class="form-group">
+          <label>Account Name <span class="required">*</span></label>
+          <input 
+            type="text" 
+            class="form-input" 
+            id="accountName" 
+            required 
+            placeholder="Business Name or Your Full Name"
+          />
+          <div class="form-help">As registered with your bank</div>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input 
+              type="checkbox" 
+              id="isPrimary" 
+              style="width: auto;"
+            />
+            Set as primary account
+          </label>
+          <div class="form-help">This will be your default payment account</div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" class="btn btn-primary">
+             Save Bank Details
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="cancelBankForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function setupSidebar() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const closeBtn = document.getElementById('sidebarClose');
+      if (!menuToggle || !sidebar || !backdrop || !closeBtn) return;
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+      }
+
+      menuToggle.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      backdrop.addEventListener('click', closeSidebar);
+      sidebar.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('click', closeSidebar);
+      });
+    }
+
+    let vendorCode = null;
+    let vendorName = null;
+    let bankAccounts = [];
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      // Check auth
+      const loggedIn = localStorage.getItem('vendor_logged_in');
+      vendorCode = localStorage.getItem('vendor_code');
+      vendorName = localStorage.getItem('vendor_name');
+
+      if (!loggedIn || !vendorCode) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      try {
+        await logoManager.init({
+          logoElementId: 'headerLogo',
+          titleElementId: 'headerTitle',
+          fallbackText: 'Vendor Portal',
+          pageType: 'Vendor Bank Details'
+        });
+      } catch (error) {
+        console.error('Logo initialization error:', error);
+      }
+
+      setupSidebar();
+
+      document.getElementById('vendorBadge').textContent = `${vendorCode} - ${vendorName || 'Vendor'}`;
+
+      // Populate banks dropdown
+      populateBanksDropdown();
+
+      // Load bank accounts
+      await loadBankAccounts();
+    }
+
+    function populateBanksDropdown() {
+      const select = document.getElementById('bankName');
+      PaymentSystem.NIGERIAN_BANKS.forEach(bank => {
+        const option = document.createElement('option');
+        option.value = bank.name;
+        option.setAttribute('data-code', bank.code);
+        option.textContent = bank.name;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadBankAccounts() {
+      try {
+        const sb = PaymentSystem.getSupabase();
+        
+        const { data, error } = await sb
+          .from('vendor_bank_details')
+          .select('*')
+          .eq('vendor_code', vendorCode)
+          .order('is_primary', { ascending: false })
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        bankAccounts = data || [];
+        renderBankAccounts();
+      } catch (error) {
+        console.error('Error loading bank accounts:', error);
+        PaymentSystem.showToast('Failed to load bank accounts', 'error');
+      }
+    }
+
+    function renderBankAccounts() {
+      const container = document.getElementById('bankAccountsList');
+
+      if (bankAccounts.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"></div>
+            <h3>No bank accounts added</h3>
+            <p>Add your bank account to receive payments</p>
+            <button class="btn btn-primary" onclick="showAddBankForm()" style="margin-top: 16px;">
+               Add Bank Account
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = bankAccounts.map(account => `
+        <div class="bank-card">
+          <div class="bank-card-header">
+            <div class="bank-name">${account.bank_name}</div>
+            ${account.is_primary ? '<div class="primary-badge">Primary Account</div>' : ''}
+          </div>
+          
+          <div class="bank-info">
+            <div class="account-number">${formatAccountNumber(account.account_number)}</div>
+            <div class="account-name">${account.account_name}</div>
+          </div>
+
+          ${account.is_verified ? `
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.9;">
+              <span>Verified</span>
+            </div>
+          ` : ''}
+
+          <div class="bank-card-footer">
+            ${!account.is_primary ? `
+              <button class="btn btn-secondary btn-small" onclick="setPrimaryAccount('${account.id}')">
+                 Set as Primary
+              </button>
+            ` : ''}
+            <button class="btn btn-secondary btn-small" onclick="editBankAccount('${account.id}')">
+               Edit
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteBankAccount('${account.id}')">
+               Delete
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatAccountNumber(number) {
+      return number.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+    }
+
+    function showAddBankForm() {
+      document.getElementById('formTitle').textContent = 'Add Bank Account';
+      document.getElementById('bankForm').style.display = 'block';
+      document.getElementById('bankDetailsForm').reset();
+      document.getElementById('bankId').value = '';
+      document.getElementById('isPrimary').checked = bankAccounts.length === 0;
+      document.getElementById('bankForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function editBankAccount(accountId) {
+      const account = bankAccounts.find(a => a.id === accountId);
+      if (!account) return;
+
+      document.getElementById('formTitle').textContent = 'Edit Bank Account';
+      document.getElementById('bankId').value = account.id;
+      document.getElementById('bankName').value = account.bank_name;
+      document.getElementById('accountNumber').value = account.account_number;
+      document.getElementById('accountName').value = account.account_name;
+      document.getElementById('isPrimary').checked = account.is_primary;
+      
+      document.getElementById('bankForm').style.display = 'block';
+      document.getElementById('bankForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelBankForm() {
+      document.getElementById('bankForm').style.display = 'none';
+      document.getElementById('bankDetailsForm').reset();
+    }
+
+    async function handleSaveBankDetails(event) {
+      event.preventDefault();
+
+      const bankId = document.getElementById('bankId').value;
+      const bankName = document.getElementById('bankName').value;
+      const accountNumber = document.getElementById('accountNumber').value;
+      const accountName = document.getElementById('accountName').value;
+      const isPrimary = document.getElementById('isPrimary').checked;
+
+      const bankOption = document.querySelector(`#bankName option[value="${bankName}"]`);
+      const bankCode = bankOption ? bankOption.getAttribute('data-code') : null;
+
+      // Validate
+      const validation = PaymentSystem.validateBankAccount({
+        bank_name: bankName,
+        account_number: accountNumber,
+        account_name: accountName
+      });
+
+      if (!validation.isValid) {
+        PaymentSystem.showToast(validation.errors[0], 'error');
+        return;
+      }
+
+      try {
+        PaymentSystem.showLoading('Saving bank details...');
+        
+        const sb = PaymentSystem.getSupabase();
+
+        const bankData = {
+          vendor_code: vendorCode,
+          bank_name: bankName,
+          bank_code: bankCode,
+          account_number: accountNumber,
+          account_name: accountName,
+          is_primary: isPrimary,
+          updated_by: vendorCode
+        };
+
+        if (bankId) {
+          // Update existing
+          const { error } = await sb
+            .from('vendor_bank_details')
+            .update(bankData)
+            .eq('id', bankId)
+            .eq('vendor_code', vendorCode);
+
+          if (error) throw error;
+        } else {
+          // Insert new
+          bankData.created_by = vendorCode;
+          
+          const { error } = await sb
+            .from('vendor_bank_details')
+            .insert([bankData]);
+
+          if (error) throw error;
+        }
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Bank details saved successfully', 'success');
+        
+        cancelBankForm();
+        await loadBankAccounts();
+      } catch (error) {
+        console.error('Error saving bank details:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to save bank details', 'error');
+      }
+    }
+
+    async function setPrimaryAccount(accountId) {
+      try {
+        PaymentSystem.showLoading('Setting primary account...');
+        
+        const sb = PaymentSystem.getSupabase();
+
+        // Update is_primary for selected account
+        const { error } = await sb
+          .from('vendor_bank_details')
+          .update({ is_primary: true })
+          .eq('id', accountId)
+          .eq('vendor_code', vendorCode);
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Primary account updated', 'success');
+        
+        await loadBankAccounts();
+      } catch (error) {
+        console.error('Error setting primary account:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to update primary account', 'error');
+      }
+    }
+
+    async function deleteBankAccount(accountId) {
+      const account = bankAccounts.find(a => a.id === accountId);
+      
+      if (account.is_primary && bankAccounts.length > 1) {
+        PaymentSystem.showToast('Cannot delete primary account. Set another account as primary first.', 'warning');
+        return;
+      }
+
+      const confirmed = await PaymentSystem.showConfirm(
+        'Delete Bank Account',
+        'Are you sure you want to delete this bank account? This action cannot be undone.'
+      );
+
+      if (!confirmed) return;
+
+      try {
+        PaymentSystem.showLoading('Deleting account...');
+        
+        const sb = PaymentSystem.getSupabase();
+
+        const { error } = await sb
+          .from('vendor_bank_details')
+          .delete()
+          .eq('id', accountId)
+          .eq('vendor_code', vendorCode);
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Bank account deleted', 'success');
+        
+        await loadBankAccounts();
+      } catch (error) {
+        console.error('Error deleting bank account:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to delete bank account', 'error');
+      }
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('vendor_logged_in');
+        localStorage.removeItem('vendor_code');
+        localStorage.removeItem('vendor_name');
+        localStorage.removeItem('vendor_email');
+        window.location.href = '../index.html';
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,1332 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Payments - JulineMart Vendor Portal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --secondary: #5b21b6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --bg-gray: #f9fafb;
+      --bg: #fafafa;
+    }
+    
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .header-logo img {
+      height: 32px;
+      width: auto;
+    }
+    
+    .vendor-badge {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .sidebar .vendor-badge {
+      background: var(--secondary);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .portal-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.2);
+      font-size: 14px;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255,255,255,0.3);
+      color: white;
+    }
+    
+    .nav-link.active {
+      background: white;
+      color: var(--primary);
+    }
+    
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .logout-btn:hover {
+      background: #4c1d95;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: var(--secondary);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle:hover {
+      background: #4c1d95;
+    }
+
+    .menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 120;
+    }
+
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      transition: right 0.2s ease;
+      z-index: 130;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      gap: 12px;
+    }
+
+    .sidebar-close {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .sidebar-close:hover {
+      background: #4c1d95;
+    }
+
+    .sidebar-link {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      font-size: 15px;
+    }
+
+    .sidebar-link.active {
+      background: #fff7ed;
+      color: var(--primary);
+    }
+
+    .sidebar-link.logout {
+      color: var(--secondary);
+      background: rgba(91,33,182,0.12);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    /* Dashboard Header */
+    .dashboard-header {
+      margin-bottom: 32px;
+    }
+    
+    .dashboard-header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .dashboard-header p {
+      color: var(--text-light);
+      font-size: 12px;
+    }
+    
+    /* Summary Card */
+    .summary-card {
+      background: linear-gradient(135deg, var(--secondary) 0%, #a220b3 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 12px rgba(119, 8, 138, 0.2);
+    }
+    
+    .summary-header {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      opacity: 0.9;
+    }
+    
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+    
+    .summary-item {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .summary-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    
+    .summary-value {
+      font-size: 10px;
+      font-weight: 700;
+    }
+    
+    .summary-subtext {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+    
+    .stat-icon {
+      font-size: 24px;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .stat-card.warning .stat-value { color: var(--warning); }
+    .stat-card.success .stat-value { color: var(--success); }
+    .stat-card.info .stat-value { color: var(--info); }
+    
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .filter-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .filter-input,
+    .filter-select {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+    
+    /* Payment Cards */
+    .payment-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .payment-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    
+    .payment-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    
+    .payment-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    
+    .payment-card-id {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .payment-card-id h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .payment-card-date {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+    
+    .payment-card-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .payment-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .payment-info-label {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+    
+    .payment-info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .payment-card-footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .payment-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    
+    .timeline-icon {
+      font-size: 16px;
+    }
+    
+    .timeline-text {
+      color: var(--text-light);
+    }
+    
+    .timeline-text.completed {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-gray);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success) 0%, var(--primary) 100%);
+      transition: width 0.3s ease;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #4c1d95;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      border: 1px solid var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: #4c1d95;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    /* Info Box */
+    .info-box {
+      background: #dbeafe;
+      border: 1px solid #60a5fa;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .info-box-icon {
+      font-size: 24px;
+    }
+    
+    .info-box-content {
+      flex: 1;
+    }
+    
+    .info-box-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #1e40af;
+    }
+    
+    .info-box-text {
+      font-size: 14px;
+      color: #1e3a8a;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .summary-card {
+        padding: 24px;
+      }
+      
+      .summary-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .summary-card {
+        padding: 20px;
+      }
+
+      .summary-item {
+        padding: 12px 10px;
+      }
+
+      .summary-label {
+        font-size: 11px;
+      }
+
+      .summary-value {
+        font-size: 10px;
+        line-height: 1.2;
+      }
+
+      .summary-subtext {
+        font-size: 10px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat-card {
+        padding: 12px 10px;
+      }
+
+      .stat-header {
+        margin-bottom: 6px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .stat-value {
+        font-size: 16px;
+      }
+
+      .filters {
+        flex-wrap: nowrap;
+        gap: 8px;
+        align-items: flex-end;
+      }
+
+      .filter-group {
+        min-width: 0;
+        flex: 1 1 0;
+      }
+
+      .filter-group label {
+        font-size: 11px;
+      }
+
+      .filter-input,
+      .filter-select {
+        min-width: 0;
+        width: 100%;
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+
+      .filters .btn {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      
+      .payment-card-body {
+        grid-template-columns: 1fr;
+      }
+
+      .payment-card-id h3 {
+        font-size: 14px;
+      }
+
+      .payment-card-date {
+        font-size: 12px;
+      }
+
+      .payment-info-label {
+        font-size: 11px;
+      }
+
+      .payment-info-value {
+        font-size: 13px;
+      }
+
+      .timeline-item {
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      .payment-card-footer .btn {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+
+      .info-box-title {
+        font-size: 12px;
+      }
+
+      .info-box-text {
+        font-size: 10px;
+      }
+
+      .payment-card-body,
+      .payment-info {
+        line-height: 1;
+      }
+      
+      .payment-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .portal-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
+  <script src="../js/shared/supabase.js"></script>
+  <script src="../js/shared/logo.js"></script>
+  <script src="../js/shared/payments.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-logo">
+          <img src="" alt="Logo" id="headerLogo" style="display: none;" />
+        </div>
+        <h1 class="header-title" id="headerTitle">Vendor Portal</h1>
+      </div>
+      <nav class="portal-nav">
+        <a href="index.html" class="nav-link">Stock Management</a>
+        <a href="payments.html" class="nav-link active">Payments</a>
+        <a href="bank-details.html" class="nav-link">Bank Details</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="vendor-badge" id="vendorBadge">Loading...</div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">x</button>
+    </div>
+    <a href="index.html" class="sidebar-link">Stock Management</a>
+    <a href="payments.html" class="sidebar-link active">Payments</a>
+    <a href="bank-details.html" class="sidebar-link">Bank Details</a>
+    <button class="sidebar-link logout" onclick="logout()">Logout</button>
+  </aside>
+
+  <div class="container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1>My Payments</h1>
+      <p>Track your earnings and payment status</p>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <div class="info-box-content">
+        <div class="info-box-title">How Payments Work</div>
+        <div class="info-box-text">
+          You receive 95% of each sale (5% commission). Payments are split: 40% advance after order, 60% balance after hub verification. All payments tracked here.
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="summary-card">
+      <div class="summary-header">Payment Summary (Last 30 Days)</div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">Total Sales</div>
+          <div class="summary-value" id="summaryTotalSales">N0.00</div>
+          <div class="summary-subtext">From <span id="summaryOrderCount">0</span> orders</div>
+        </div>
+        
+        <div class="summary-item">
+          <div class="summary-label">Commission (5%)</div>
+          <div class="summary-value" id="summaryCommission">N0.00</div>
+          <div class="summary-subtext">Platform fee</div>
+        </div>
+        
+        <div class="summary-item">
+          <div class="summary-label">Your Earnings</div>
+          <div class="summary-value" id="summaryEarnings">N0.00</div>
+          <div class="summary-subtext">After commission</div>
+        </div>
+        
+        <div class="summary-item" style="background: rgba(255,255,255,0.2);">
+          <div class="summary-label">Paid to You</div>
+          <div class="summary-value" id="summaryPaid">N0.00</div>
+          <div class="summary-subtext">Received</div>
+        </div>
+        
+        <div class="summary-item" style="background: rgba(255,255,255,0.2);">
+          <div class="summary-label">Pending Payment</div>
+          <div class="summary-value" id="summaryPending">N0.00</div>
+          <div class="summary-subtext">In progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-card warning">
+        <div class="stat-header">
+          <span class="stat-label">Advance Due</span>
+          <span class="stat-icon"></span>
+        </div>
+        <div class="stat-value" id="statAdvanceDue">N0.00</div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-header">
+          <span class="stat-label">Balance Due</span>
+          <span class="stat-icon"></span>
+        </div>
+        <div class="stat-value" id="statBalanceDue">N0.00</div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-header">
+          <span class="stat-label">Completed</span>
+          <span class="stat-icon"></span>
+        </div>
+        <div class="stat-value" id="statCompleted">0</div>
+      </div>
+    </div>
+
+    <!-- Payments List -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Your Orders & Payments</h2>
+        <button class="btn btn-secondary" onclick="exportMyPayments()">
+           Export</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <label>Search</label>
+          <input 
+            type="text" 
+            class="filter-input" 
+            id="searchInput" 
+            placeholder="Order ID, reference..." 
+            onkeyup="filterPayments()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <label>Status</label>
+          <select class="filter-select" id="statusFilter" onchange="filterPayments()">
+            <option value="">All Status</option>
+            <option value="pending_advance">Advance Pending</option>
+            <option value="advance_paid">Advance Paid</option>
+            <option value="hub_pending">At Hub</option>
+            <option value="hub_verified">Balance Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Payment Cards -->
+      <div class="payment-cards" id="paymentCards">
+        <div class="empty-state">
+          <div class="empty-state-icon"></div>
+          <h3>Loading your payments...</h3>
+          <p>Please wait while we fetch your payment records</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setupSidebar() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const closeBtn = document.getElementById('sidebarClose');
+      if (!menuToggle || !sidebar || !backdrop || !closeBtn) return;
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+      }
+
+      menuToggle.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      backdrop.addEventListener('click', closeSidebar);
+      sidebar.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('click', closeSidebar);
+      });
+    }
+
+    // Global variables
+    let allPayments = [];
+    let filteredPayments = [];
+    let vendorCode = null;
+    let vendorName = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      // Check vendor auth
+      const loggedIn = localStorage.getItem('vendor_logged_in');
+      vendorCode = localStorage.getItem('vendor_code');
+      vendorName = localStorage.getItem('vendor_name');
+
+      if (!loggedIn || !vendorCode) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      try {
+        await logoManager.init({
+          logoElementId: 'headerLogo',
+          titleElementId: 'headerTitle',
+          fallbackText: 'Vendor Portal',
+          pageType: 'Vendor Payments'
+        });
+      } catch (error) {
+        console.error('Logo initialization error:', error);
+      }
+
+      setupSidebar();
+
+      // Update vendor badge
+      document.getElementById('vendorBadge').textContent = `${vendorCode} - ${vendorName || 'Vendor'}`;
+
+      // Load payments
+      await loadPayments();
+    }
+
+    async function loadPayments() {
+      try {
+        PaymentSystem.showLoading('Loading your payments...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        // Note: RLS policies will automatically filter by vendor_code
+        // No need to set context manually
+        
+        // Get all payments for this vendor
+        const { data: payments, error } = await sb
+          .from('vendor_payments')
+          .select('*')
+          .eq('vendor_code', vendorCode)
+          .order('order_date', { ascending: false });
+
+        if (error) throw error;
+
+        allPayments = payments || [];
+        filteredPayments = [...allPayments];
+        
+        renderPayments();
+        updateSummary();
+        updateStats();
+        
+        PaymentSystem.hideLoading();
+      } catch (error) {
+        console.error('Error loading payments:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to load payments', 'error');
+      }
+    }
+
+    function renderPayments() {
+      const container = document.getElementById('paymentCards');
+      
+      if (filteredPayments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"></div>
+            <h3>No payments found</h3>
+            <p>Your payment records will appear here once orders are created</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredPayments.map(payment => {
+        const progress = PaymentSystem.getPaymentProgress(payment);
+        
+        return `
+          <div class="payment-card">
+            <div class="payment-card-header">
+              <div class="payment-card-id">
+                <h3>Order #${payment.order_id}</h3>
+                ${PaymentSystem.getStatusBadge(payment.payment_status)}
+              </div>
+              <div class="payment-card-date">
+                ${PaymentSystem.formatDate(payment.order_date)}
+              </div>
+            </div>
+
+            <div class="payment-card-body">
+              <div class="payment-info">
+                <div class="payment-info-label">Product Total</div>
+                <div class="payment-info-value">${PaymentSystem.formatCurrency(payment.product_total)}</div>
+              </div>
+
+              <div class="payment-info">
+                <div class="payment-info-label">Commission (5%)</div>
+                <div class="payment-info-value" style="color: var(--danger);">
+                  -${PaymentSystem.formatCurrency(payment.commission_amount)}
+                </div>
+              </div>
+
+              <div class="payment-info">
+                <div class="payment-info-label">Your Earnings</div>
+                <div class="payment-info-value" style="color: var(--success);">
+                  ${PaymentSystem.formatCurrency(payment.vendor_earnings)}
+                </div>
+              </div>
+
+              <div class="payment-info">
+                <div class="payment-info-label">Hub</div>
+                <div class="payment-info-value" style="font-size: 14px;">
+                  ${payment.hub_name || '-'}
+                </div>
+              </div>
+            </div>
+
+            <div class="payment-card-footer">
+              <div class="payment-timeline">
+                <div class="timeline-item">
+                  <span class="timeline-icon">${payment.advance_paid ? '' : ''}</span>
+                  <span class="timeline-text ${payment.advance_paid ? 'completed' : ''}">
+                    Advance (40%): ${PaymentSystem.formatCurrency(payment.advance_amount)}
+                    ${payment.advance_paid ? `- Paid ${PaymentSystem.formatDate(payment.advance_paid_date)}` : '- Pending'}
+                  </span>
+                </div>
+
+                ${payment.advance_paid ? `
+                  <div class="timeline-item">
+                    <span class="timeline-icon">${payment.hub_verified ? '' : payment.hub_received ? '' : ''}</span>
+                    <span class="timeline-text ${payment.hub_verified ? 'completed' : ''}">
+                      ${payment.hub_verified ? `Hub Verified - ${PaymentSystem.formatDate(payment.hub_verified_date)}` :
+                        payment.hub_received ? `At Hub - ${PaymentSystem.formatDate(payment.hub_received_date)}` :
+                        'Deliver to hub'}
+                    </span>
+                  </div>
+                ` : ''}
+
+                <div class="timeline-item">
+                  <span class="timeline-icon">${payment.balance_paid ? '' : ''}</span>
+                  <span class="timeline-text ${payment.balance_paid ? 'completed' : ''}">
+                    Balance (60%): ${PaymentSystem.formatCurrency(payment.balance_amount)}
+                    ${payment.balance_paid ? `- Paid ${PaymentSystem.formatDate(payment.balance_paid_date)}` : '- Pending'}
+                  </span>
+                </div>
+              </div>
+
+              ${payment.payment_status === 'completed' ? `
+                <button class="btn btn-primary" onclick="viewReceipt('${payment.id}')">
+                   View Receipt
+                </button>
+              ` : `
+                <button class="btn btn-secondary" onclick="viewDetails('${payment.id}')">
+                  View Details
+                </button>
+              `}
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progress}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateSummary() {
+      // Calculate summary for last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const recentPayments = allPayments.filter(p => {
+        const orderDate = new Date(p.order_date);
+        return orderDate >= thirtyDaysAgo;
+      });
+
+      const totalSales = recentPayments.reduce((sum, p) => sum + parseFloat(p.product_total), 0);
+      const totalCommission = recentPayments.reduce((sum, p) => sum + parseFloat(p.commission_amount), 0);
+      const totalEarnings = recentPayments.reduce((sum, p) => sum + parseFloat(p.vendor_earnings), 0);
+      const totalPaid = recentPayments.reduce((sum, p) => {
+        if (p.payment_status === 'completed') return sum + parseFloat(p.vendor_earnings);
+        let paid = 0;
+        if (p.advance_paid) paid += parseFloat(p.advance_amount);
+        if (p.balance_paid) paid += parseFloat(p.balance_amount);
+        return sum + paid;
+      }, 0);
+      const totalPending = totalEarnings - totalPaid;
+
+      document.getElementById('summaryOrderCount').textContent = recentPayments.length;
+      document.getElementById('summaryTotalSales').textContent = PaymentSystem.formatCurrency(totalSales);
+      document.getElementById('summaryCommission').textContent = PaymentSystem.formatCurrency(totalCommission);
+      document.getElementById('summaryEarnings').textContent = PaymentSystem.formatCurrency(totalEarnings);
+      document.getElementById('summaryPaid').textContent = PaymentSystem.formatCurrency(totalPaid);
+      document.getElementById('summaryPending').textContent = PaymentSystem.formatCurrency(totalPending);
+    }
+
+    function updateStats() {
+      // Advance due
+      const advanceDue = allPayments
+        .filter(p => !p.advance_paid)
+        .reduce((sum, p) => sum + parseFloat(p.advance_amount), 0);
+      document.getElementById('statAdvanceDue').textContent = PaymentSystem.formatCurrency(advanceDue);
+
+      // Balance due
+      const balanceDue = allPayments
+        .filter(p => p.advance_paid && !p.balance_paid)
+        .reduce((sum, p) => sum + parseFloat(p.balance_amount), 0);
+      document.getElementById('statBalanceDue').textContent = PaymentSystem.formatCurrency(balanceDue);
+
+      // Completed
+      const completed = allPayments.filter(p => p.payment_status === 'completed').length;
+      document.getElementById('statCompleted').textContent = completed;
+    }
+
+    function filterPayments() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+
+      filteredPayments = allPayments.filter(payment => {
+        const matchesSearch = !search || 
+          payment.order_id.toString().includes(search) ||
+          (payment.order_reference && payment.order_reference.toLowerCase().includes(search));
+        
+        const matchesStatus = !status || payment.payment_status === status;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      renderPayments();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      filterPayments();
+    }
+
+    function viewDetails(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      const details = `
+Order #${payment.order_id}
+Date: ${PaymentSystem.formatDate(payment.order_date)}
+Hub: ${payment.hub_name || '-'}
+
+Financial Breakdown:
+Product Total: ${PaymentSystem.formatCurrency(payment.product_total)}
+Commission (5%): ${PaymentSystem.formatCurrency(payment.commission_amount)}
+Your Earnings: ${PaymentSystem.formatCurrency(payment.vendor_earnings)}
+
+Payment Split:
+Advance (40%): ${PaymentSystem.formatCurrency(payment.advance_amount)} ${payment.advance_paid ? ' Paid' : ' Pending'}
+Balance (60%): ${PaymentSystem.formatCurrency(payment.balance_amount)} ${payment.balance_paid ? ' Paid' : ' Pending'}
+
+Status: ${PaymentSystem.STATUS_CONFIG[payment.payment_status].label}
+${payment.notes ? `\nNotes: ${payment.notes}` : ''}
+      `;
+
+      alert(details);
+    }
+
+    async function viewReceipt(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+      if (!payment.balance_paid) {
+        PaymentSystem.showToast('Receipt is available after final payment.', 'info');
+        return;
+      }
+
+      const logoMarkup = (window.logoManager && typeof logoManager.getLogoForPrint === 'function')
+        ? await logoManager.getLogoForPrint()
+        : '<div style="font-size: 20px; font-weight: 700; color: #2d1b69;">JulineMart</div>';
+
+      const receiptHtml = `
+        <div class="receipt">
+          <div class="receipt-header">
+            <div class="logo">${logoMarkup}</div>
+            <div class="receipt-title">
+              <div style="font-size: 18px; font-weight: 700;">Payment Receipt</div>
+              <div style="font-size: 12px; color: #6b7280;">Order #${payment.order_id}</div>
+            </div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Order Date:</span><strong>${PaymentSystem.formatDate(payment.order_date)}</strong></div>
+            <div class="row"><span>Vendor:</span><strong>${payment.vendor_code} - ${payment.vendor_name || payment.vendor_code}</strong></div>
+            <div class="row"><span>Hub:</span><strong>${payment.hub_name || '-'}</strong></div>
+            <div class="row"><span>Reference:</span><strong>${payment.order_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Product Total:</span><strong>${PaymentSystem.formatCurrency(payment.product_total)}</strong></div>
+            <div class="row"><span>Commission (5%):</span><strong>-${PaymentSystem.formatCurrency(payment.commission_amount)}</strong></div>
+            <div class="row"><span>Your Earnings:</span><strong>${PaymentSystem.formatCurrency(payment.vendor_earnings)}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Advance Paid:</span><strong>${PaymentSystem.formatCurrency(payment.advance_amount)}</strong></div>
+            <div class="row"><span>Advance Date:</span><strong>${payment.advance_paid_date ? PaymentSystem.formatDate(payment.advance_paid_date) : '-'}</strong></div>
+            <div class="row"><span>Advance Method:</span><strong>${payment.advance_payment_method || '-'}</strong></div>
+            <div class="row"><span>Advance Reference:</span><strong>${payment.advance_payment_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Balance Paid:</span><strong>${PaymentSystem.formatCurrency(payment.balance_amount)}</strong></div>
+            <div class="row"><span>Balance Date:</span><strong>${payment.balance_paid_date ? PaymentSystem.formatDate(payment.balance_paid_date) : '-'}</strong></div>
+            <div class="row"><span>Balance Method:</span><strong>${payment.balance_payment_method || '-'}</strong></div>
+            <div class="row"><span>Balance Reference:</span><strong>${payment.balance_payment_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section total">
+            <div class="row"><span>Status:</span><strong>Paid in Full</strong></div>
+          </div>
+        </div>
+      `;
+
+      const styles = `
+        @media print { @page { margin: 0; } body { margin: 1cm; } }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f5f5f5; }
+        .receipt { max-width: 640px; margin: 20px auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
+        .receipt-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 16px; }
+        .receipt-header .logo img { max-height: 48px; max-width: 160px; object-fit: contain; }
+        .receipt-section { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+        .receipt-section:last-child { border-bottom: none; }
+        .row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+        .total { background: #f9fafb; border-radius: 8px; padding: 12px; }
+      `;
+
+      const w = window.open('', '_blank', 'width=800,height=700');
+      if (!w) {
+        PaymentSystem.showToast('Please allow pop-ups to print the receipt.', 'warning');
+        return;
+      }
+      w.document.write(`<!DOCTYPE html><html><head><title>Receipt #${payment.order_id}</title><style>${styles}</style></head><body>${receiptHtml}</body></html>`);
+      w.document.close();
+      w.focus();
+      w.print();
+    }
+
+    function exportMyPayments() {
+      if (filteredPayments.length === 0) {
+        PaymentSystem.showToast('No payments to export', 'warning');
+        return;
+      }
+
+      const exportData = filteredPayments.map(p => ({
+        'Order ID': p.order_id,
+        'Date': PaymentSystem.formatDate(p.order_date),
+        'Hub': p.hub_name || '',
+        'Product Total': p.product_total,
+        'Commission': p.commission_amount,
+        'Your Earnings': p.vendor_earnings,
+        'Advance Amount': p.advance_amount,
+        'Advance Paid': p.advance_paid ? 'Yes' : 'No',
+        'Advance Date': PaymentSystem.formatDate(p.advance_paid_date),
+        'Balance Amount': p.balance_amount,
+        'Balance Paid': p.balance_paid ? 'Yes' : 'No',
+        'Balance Date': PaymentSystem.formatDate(p.balance_paid_date),
+        'Status': p.payment_status,
+        'Reference': p.order_reference || ''
+      }));
+
+      PaymentSystem.exportToCSV(
+        exportData, 
+        `${vendorCode}-payments-${new Date().toISOString().split('T')[0]}.csv`
+      );
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('vendor_logged_in');
+        localStorage.removeItem('vendor_code');
+        localStorage.removeItem('vendor_name');
+        localStorage.removeItem('vendor_email');
+        window.location.href = '../index.html';
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+

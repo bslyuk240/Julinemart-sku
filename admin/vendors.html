@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -41,8 +41,34 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 20px;
     }
     
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: white;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
     .back-link {
       color: white;
       text-decoration: none;
@@ -58,6 +84,144 @@
     .back-link:hover {
       background: rgba(255,255,255,0.2);
     }
+
+    .portal-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .nav-link:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .nav-link.active {
+      background: white;
+      color: var(--purple);
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: rgba(239,68,68,0.2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239,68,68,0.35);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 120;
+    }
+
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      transition: right 0.2s ease;
+      z-index: 130;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-close {
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .sidebar-link {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .sidebar-link.active {
+      background: #f5f3ff;
+      color: var(--purple);
+    }
+
+    .sidebar-link.logout {
+      color: #ef4444;
+      background: rgba(239,68,68,0.08);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
     
     .container {
       max-width: 1400px;
@@ -70,12 +234,13 @@
     }
     
     .page-header h1 {
-      font-size: 32px;
+      font-size: 14px;
       margin-bottom: 8px;
     }
     
     .page-header p {
       color: var(--text-light);
+      font-size: 12px;
     }
     
     .card {
@@ -100,7 +265,7 @@
       padding: 16px;
       margin-bottom: 24px;
       color: #1e40af;
-      font-size: 14px;
+      font-size: 10px;
       line-height: 1.6;
     }
     
@@ -108,6 +273,7 @@
       color: #1e3a8a;
       display: block;
       margin-bottom: 8px;
+      font-size: 12px;
     }
     
     .table-container {
@@ -120,6 +286,26 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+    }
+
+    .row-details {
+      display: none;
+      margin-top: 6px;
+    }
+
+    .row-details summary {
+      cursor: pointer;
+      color: var(--purple);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .row-details .detail-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      padding: 2px 0;
     }
     
     th {
@@ -259,86 +445,114 @@
       .form-grid {
         grid-template-columns: 1fr;
       }
+
+      .table-container {
+        overflow-x: visible;
+      }
+
+      table {
+        font-size: 12px;
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        padding: 8px 10px;
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .vendors-table th,
+      .vendors-table td {
+        font-size: 10px;
+      }
+
+      .vendors-table th:nth-child(1),
+      .vendors-table td:nth-child(1) {
+        width: 17%;
+      }
+
+      .vendors-table th:nth-child(2),
+      .vendors-table td:nth-child(2) {
+        width: 35%;
+      }
+
+      .vendors-table th:nth-child(3),
+      .vendors-table td:nth-child(3) {
+        width: 60%;
+      }
+
+      .col-mobile-hidden {
+        display: none;
+      }
+
+      .row-details {
+        display: block;
+      }
+
+      .portal-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
   <script src="../js/shared/supabase.js"></script>
-  <script src="../js/shared/vendor-manager.js"></script>
   <script src="../js/shared/logo.js"></script>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <img src="" alt="Logo" id="headerLogo" style="display: none; height: 32px; width: auto; object-fit: contain;" />
-        <h1 id="headerTitle" style="font-size: 20px; font-weight: 600;">👥 Vendor Management</h1>
+      <div class="logo-title">
+        <img src="" alt="Logo" class="header-logo" id="headerLogo" style="display: none;" />
+        <h1 id="headerTitle" class="header-title">Admin Portal</h1>
       </div>
-      <a href="index.html" class="back-link">← Back to Admin</a>
+      <div class="header-right">
+        <nav class="portal-nav">
+          <a href="index.html#create" class="nav-link">Create</a>
+          <a href="index.html#search" class="nav-link">SKU List</a>
+          <a href="inventory.html" class="nav-link">Inventory</a>
+          <a href="index.html#settings" class="nav-link">Settings</a>
+          <a href="vendors.html" class="nav-link active">Vendors</a>
+          <a href="payments.html" class="nav-link">Payments</a>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span>Admin Menu</span>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">&times;</button>
+    </div>
+    <a href="index.html#create" class="sidebar-link">Create</a>
+    <a href="index.html#search" class="sidebar-link">SKU List</a>
+    <a href="inventory.html" class="sidebar-link">Inventory</a>
+    <a href="index.html#settings" class="sidebar-link">Settings</a>
+    <a href="vendors.html" class="sidebar-link active">Vendors</a>
+    <a href="payments.html" class="sidebar-link">Payments</a>
+    <button class="sidebar-link logout" onclick="logout()">Logout</button>
+  </aside>
 
   <div class="container">
     <div class="page-header">
       <h1>Vendor Accounts</h1>
-      <p>Manage vendor access and send invitation emails</p>
+      <p>Manage vendor access and send password reset emails</p>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Create New Vendor</h2>
-      
-      <div class="success-msg" id="createSuccessMsg"></div>
-      <div class="error-msg" id="createErrorMsg"></div>
-      
-      <form id="createVendorForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Vendor Code (3 letters)</label>
-            <input 
-              type="text" 
-              id="newVendorCode" 
-              maxlength="3" 
-              placeholder="ABC" 
-              style="text-transform: uppercase;" 
-              required 
-            />
-          </div>
-          <div class="form-group">
-            <label>Vendor Name</label>
-            <input 
-              type="text" 
-              id="newVendorName" 
-              placeholder="Business Name" 
-              required 
-            />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>Vendor Email</label>
-          <input 
-            type="email" 
-            id="newVendorEmail" 
-            placeholder="vendor@business.com" 
-            required 
-          />
-          <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
-            📧 The vendor will receive an invitation email to set up their account
-          </div>
-        </div>
-        
-        <div class="btn-group">
-          <button type="submit" class="btn btn-primary">
-            Create Vendor & Send Invitation
-          </button>
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('createVendorForm').reset()">
-            Clear Form
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-  <h2 class="card-title">Send Password Reset</h2>
+  <h2 class="card-title" style="font-size: 12px;">Send Password Reset</h2>
   
   <div class="info-box">
     <strong>📧 Password Reset Instructions:</strong>
@@ -381,14 +595,14 @@
       <div class="error-msg" id="errorMsg"></div>
 
       <div class="table-container">
-        <table>
+        <table class="vendors-table">
           <thead>
             <tr>
               <th>Vendor Code</th>
               <th>Vendor Name</th>
               <th>Email</th>
-              <th>Products</th>
-              <th>Created</th>
+              <th class="col-mobile-hidden">Products</th>
+              <th class="col-mobile-hidden">Created</th>
             </tr>
           </thead>
           <tbody id="vendorsTable">
@@ -404,6 +618,38 @@
   </div>
 
   <script>
+    function setupSidebar() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const closeBtn = document.getElementById('sidebarClose');
+      if (!menuToggle || !sidebar || !backdrop || !closeBtn) return;
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+      }
+
+      menuToggle.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      backdrop.addEventListener('click', closeSidebar);
+      sidebar.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('click', closeSidebar);
+      });
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('jm_user');
+        window.location.href = '../index.html';
+      }
+    }
+
     const SUPABASE_URL = window.SUPABASE_URL || 'https://hnpwnjjjgxuelfognakp.supabase.co';
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucHduampqZ3h1ZWxmb2duYWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3NTU2NDYsImV4cCI6MjA3NDMzMTY0Nn0.AVaBAzmddxnZz23YIu7IaeZzTEPI6n8CjyahRQvZSHk';
 
@@ -481,7 +727,7 @@
             <td colspan="5">
               <div class="empty-state">
                 📦 No vendors found<br>
-                <small>Create your first vendor above</small>
+                <small>Vendors appear after their first SKU is created</small>
               </div>
             </td>
           </tr>
@@ -492,12 +738,19 @@
       tbody.innerHTML = allVendors.map(v => `
         <tr>
           <td><span class="vendor-code">${v.vendor_code}</span></td>
-          <td>${v.vendor_name || '-'}</td>
+          <td>
+            ${v.vendor_name || '-'}
+            <details class="row-details">
+              <summary>View more</summary>
+              <div class="detail-item"><span>Products:</span><span>${v.product_count}</span></div>
+              <div class="detail-item"><span>Created:</span><span>${v.created_at ? new Date(v.created_at).toLocaleDateString() : '-'}</span></div>
+            </details>
+          </td>
           <td>
             ${v.email ? `<span class="email-badge">📧 ${v.email}</span>` : '<span style="color: var(--text-light);">No email</span>'}
           </td>
-          <td style="font-weight: 600;">${v.product_count}</td>
-          <td style="font-size: 12px; color: var(--text-light);">
+          <td class="col-mobile-hidden" style="font-weight: 600;">${v.product_count}</td>
+          <td class="col-mobile-hidden" style="font-size: 12px; color: var(--text-light);">
             ${v.created_at ? new Date(v.created_at).toLocaleDateString() : '-'}
           </td>
         </tr>
@@ -518,125 +771,15 @@
       setTimeout(() => el.classList.remove('show'), 8000);
     }
 
-    function showCreateSuccess(message) {
-      showSuccess(message, 'createSuccessMsg');
-    }
-
-    function showCreateError(message) {
-      showError(message, 'createErrorMsg');
-    }
-
-    // Handle vendor creation form
-    document.getElementById('createVendorForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const vendorCode = document.getElementById('newVendorCode').value.trim().toUpperCase();
-      const vendorName = document.getElementById('newVendorName').value.trim();
-      const vendorEmail = document.getElementById('newVendorEmail').value.trim().toLowerCase();
-      
-      if (!vendorCode || vendorCode.length !== 3) {
-        showCreateError('Vendor code must be exactly 3 letters');
-        return;
-      }
-      
-      if (!vendorName) {
-        showCreateError('Vendor name is required');
-        return;
-      }
-      
-      if (!vendorEmail) {
-        showCreateError('Vendor email is required');
-        return;
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(vendorEmail)) {
-        showCreateError('Please enter a valid email address');
-        return;
-      }
-      
-      try {
-        const createBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = createBtn.textContent;
-        createBtn.disabled = true;
-        createBtn.textContent = 'Creating vendor...';
-        
-        console.log('📝 Creating vendor:', vendorCode);
-
-        // Create vendor with authentication using vendor-manager
-        if (typeof vendorManager === 'undefined') {
-          throw new Error('Vendor manager not loaded. Please refresh the page.');
-        }
-
-        const result = await vendorManager.createVendorWithAuth(vendorCode, vendorName, vendorEmail);
-        
-        let successMsg = `✅ Vendor "${vendorName}" (${vendorCode}) created successfully!`;
-        
-        if (result.authCreated) {
-          successMsg += ' Auth account created.';
-        }
-        if (result.emailSent) {
-          successMsg += ` 📧 Invitation email sent to ${vendorEmail}.`;
-        } else if (result.authCreated) {
-          successMsg += ' ⚠️ Auth created but email not sent - ask vendor to use "Forgot Password".';
-        }
-        
-        showCreateSuccess(successMsg);
-        
-        // Reset form
-        document.getElementById('createVendorForm').reset();
-        
-        // Reload vendors list
-        await loadVendors();
-        
-        createBtn.textContent = originalText;
-        createBtn.disabled = false;
-        
-      } catch (error) {
-        console.error('❌ Error creating vendor:', error);
-        
-        let errorMsg = 'Failed to create vendor';
-        
-        if (error.message.includes('duplicate key') || error.message.includes('already exists')) {
-          errorMsg = 'A vendor with this code or email already exists';
-        } else if (error.message.includes('User already registered')) {
-          errorMsg = 'This email is already registered. Vendor created but no new auth account was needed.';
-          // Still reload vendors as it might have been created
-          await loadVendors();
-        } else if (error.message) {
-          errorMsg += ': ' + error.message;
-        }
-        
-        showCreateError(errorMsg);
-        
-        const createBtn = e.target.querySelector('button[type="submit"]');
-        createBtn.disabled = false;
-        createBtn.textContent = 'Create Vendor & Send Invitation';
-      }
-    });
-
-    // Auto-suggest vendor code based on name
-    document.getElementById('newVendorName').addEventListener('input', (e) => {
-      const name = e.target.value.trim();
-      const codeInput = document.getElementById('newVendorCode');
-      
-      if (name && !codeInput.value) {
-        const suggestedCode = name.replace(/[^A-Z]/gi, '').slice(0, 3).toUpperCase();
-        if (suggestedCode.length >= 2) {
-          codeInput.value = suggestedCode.padEnd(3, 'X');
-        }
-      }
-    });
-
     // Initialize
     logoManager.init({
       logoElementId: 'headerLogo',
       titleElementId: 'headerTitle',
-      fallbackText: '👥 Vendor Management',
+      fallbackText: 'Admin Portal',
       pageType: 'Vendor Management'
     });
     
+    setupSidebar();
     loadVendors();
     
     // Handle password reset form

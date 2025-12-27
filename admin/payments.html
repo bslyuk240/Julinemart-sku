@@ -1,0 +1,2453 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Management - JulineMart Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --purple-dark: #2d1b69;
+      --primary: #5b21b6;
+      --primary-hover: #7c3aed;
+      --secondary: #f97316;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --bg-gray: #f9fafb;
+      --bg: #fafafa;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--purple-dark) 0%, var(--primary) 100%);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .header-logo img {
+      height: 32px;
+      width: auto;
+    }
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .portal-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .nav-link:hover {
+      background: rgba(255,255,255,0.25);
+      color: white;
+    }
+    
+    .nav-link.active {
+      background: white;
+      color: var(--primary);
+    }
+    
+    .logout-btn {
+      padding: 8px 16px;
+      background: rgba(239,68,68,0.2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(239,68,68,0.35);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 120;
+    }
+
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      transition: right 0.2s ease;
+      z-index: 130;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-close {
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .sidebar-link {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .sidebar-link.active {
+      background: #f5f3ff;
+      color: var(--primary);
+    }
+
+    .sidebar-link.logout {
+      color: #ef4444;
+      background: rgba(239,68,68,0.08);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .page-header p {
+      color: var(--text-light);
+      font-size: 12px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+    
+    .stat-icon {
+      font-size: 24px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .stat-card.warning .stat-value {
+      color: var(--warning);
+    }
+    
+    .stat-card.success .stat-value {
+      color: var(--success);
+    }
+    
+    .stat-card.info .stat-value {
+      color: var(--info);
+    }
+    
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-actions .btn {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-success:hover:not(:disabled) {
+      background: #059669;
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .btn-warning:hover:not(:disabled) {
+      background: #d97706;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-gray);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #e5e7eb;
+    }
+    
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .filter-group label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .filter-input,
+    .filter-select {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 10px;
+      min-width: 160px;
+    }
+    
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .filters .btn {
+      font-size: 14px;
+      padding: 8px 12px;
+    }
+    
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .row-details {
+      display: none;
+      margin-top: 6px;
+    }
+
+    .row-details summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .row-details .detail-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      padding: 2px 0;
+    }
+
+    .row-details .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    
+    th {
+      background: var(--bg-gray);
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:hover td {
+      background: var(--bg-gray);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .modal-footer {
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-group label .required {
+      color: var(--danger);
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-help {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+    
+    .form-error {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 4px;
+    }
+    
+    /* Loading */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat-card {
+        padding: 10px;
+      }
+
+      .stat-label {
+        font-size: 10px;
+      }
+
+      .stat-value {
+        font-size: 16px;
+      }
+
+      .stat-icon {
+        display: none;
+      }
+      
+      .filters {
+        flex-direction: row;
+        gap: 8px;
+      }
+      
+      .filter-input,
+      .filter-select {
+        width: 100%;
+      }
+
+      .table-container {
+        font-size: 12px;
+        overflow-x: visible;
+      }
+      
+      th, td {
+        padding: 8px;
+      }
+
+      table {
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .table-container .btn {
+        padding: 4px 8px;
+        font-size: 14px;
+      }
+
+      .payments-table th,
+      .payments-table td {
+        font-size: 10px;
+      }
+
+      .payments-table th:nth-child(1),
+      .payments-table td:nth-child(1) {
+        width: 15%;
+      }
+
+      .payments-table th:nth-child(3),
+      .payments-table td:nth-child(3) {
+        width: 60%;
+      }
+
+      .payments-table th:nth-child(9),
+      .payments-table td:nth-child(9) {
+        width: 40%;
+      }
+
+      .col-mobile-hidden {
+        display: none;
+      }
+
+      .row-details {
+        display: block;
+      }
+
+      .portal-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
+  <script src="../js/shared/supabase.js"></script>
+  <script src="../js/shared/auth.js"></script>
+  <script src="../js/shared/logo.js"></script>
+  <script src="../js/shared/payments.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo-title">
+        <img src="" alt="Logo" class="header-logo" id="headerLogo" style="display: none;" />
+        <h1 class="header-title" id="headerTitle">Admin Portal</h1>
+      </div>
+      <div class="header-right">
+        <nav class="portal-nav">
+          <a href="index.html#create" class="nav-link">Create</a>
+          <a href="index.html#search" class="nav-link">SKU List</a>
+          <a href="inventory.html" class="nav-link">Inventory</a>
+          <a href="index.html#settings" class="nav-link">Settings</a>
+          <a href="vendors.html" class="nav-link">Vendors</a>
+          <a href="payments.html" class="nav-link active">Payments</a>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span>Admin Menu</span>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">&times;</button>
+    </div>
+    <a href="index.html#create" class="sidebar-link">Create</a>
+    <a href="index.html#search" class="sidebar-link">SKU List</a>
+    <a href="inventory.html" class="sidebar-link">Inventory</a>
+    <a href="index.html#settings" class="sidebar-link">Settings</a>
+    <a href="vendors.html" class="sidebar-link">Vendors</a>
+    <a href="payments.html" class="sidebar-link active">Payments</a>
+    <button class="sidebar-link logout" onclick="logout()">Logout</button>
+  </aside>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Payment Management</h1>
+      <p>Track and manage vendor payments</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card warning">
+        <div class="stat-header">
+          <span class="stat-label">Pending Advance</span>
+          <span class="stat-icon">⏳</span>
+        </div>
+        <div class="stat-value" id="statPendingAdvance">0</div>
+        <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
+          <span id="statPendingAdvanceAmount">₦0.00</span>
+        </div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-header">
+          <span class="stat-label">At Hub</span>
+          <span class="stat-icon">🚚</span>
+        </div>
+        <div class="stat-value" id="statAtHub">0</div>
+        <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
+          Awaiting verification
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-header">
+          <span class="stat-label">Balance Ready</span>
+          <span class="stat-icon">💰</span>
+        </div>
+        <div class="stat-value" id="statBalanceReady">0</div>
+        <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
+          <span id="statBalanceReadyAmount">₦0.00</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Completed Today</span>
+          <span class="stat-icon">✅</span>
+        </div>
+        <div class="stat-value" id="statCompletedToday">0</div>
+        <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
+          <span id="statCompletedTodayAmount">₦0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">All Payments</h2>
+        <div class="card-actions">
+          <button class="btn btn-primary" onclick="openNewPaymentModal()">
+            ➕ Record New Order
+          </button>
+          <button class="btn btn-secondary" onclick="exportPayments()">
+            📥 Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <label>Search</label>
+          <input 
+            type="text" 
+            class="filter-input" 
+            id="searchInput" 
+            placeholder="Order ID, vendor, reference..." 
+            onkeyup="filterPayments()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <label>Vendor</label>
+          <select class="filter-select" id="vendorFilter" onchange="filterPayments()">
+            <option value="">All Vendors</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Status</label>
+          <select class="filter-select" id="statusFilter" onchange="filterPayments()">
+            <option value="">All Status</option>
+            <option value="pending_advance">Pending Advance</option>
+            <option value="advance_paid">Advance Paid</option>
+            <option value="hub_pending">At Hub</option>
+            <option value="hub_verified">Hub Verified</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Hub</label>
+          <select class="filter-select" id="hubFilter" onchange="filterPayments()">
+            <option value="">All Hubs</option>
+            <option value="Lagos Hub">Lagos Hub</option>
+            <option value="Warri Hub">Warri Hub</option>
+            <option value="Abuja Hub">Abuja Hub</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th class="col-mobile-hidden">Date</th>
+              <th>Vendor</th>
+              <th class="col-mobile-hidden">Hub</th>
+              <th class="col-mobile-hidden">Total</th>
+              <th class="col-mobile-hidden">Earnings</th>
+              <th class="col-mobile-hidden">Advance</th>
+              <th class="col-mobile-hidden">Balance</th>
+              <th>Status</th>
+              <th class="col-mobile-hidden">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTable">
+            <tr>
+              <td colspan="10">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📊</div>
+                  <h3>Loading payments...</h3>
+                  <p>Please wait while we fetch payment records</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Payment Modal -->
+  <div class="modal" id="newPaymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Record New Order Payment</h3>
+      </div>
+      <div class="modal-body">
+        <form id="newPaymentForm" onsubmit="handleNewPayment(event)">
+          <div class="form-group">
+            <label>Order ID <span class="required">*</span></label>
+            <input type="number" class="form-input" id="newOrderId" required min="1" />
+            <div class="form-help">WooCommerce order ID</div>
+          </div>
+
+          <div class="form-group">
+            <label>Order Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="newOrderDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Vendor <span class="required">*</span></label>
+            <select class="form-select" id="newVendorCode" required>
+              <option value="">Select vendor...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Hub <span class="required">*</span></label>
+            <select class="form-select" id="newHubName" required>
+              <option value="">Select hub...</option>
+              <option value="Lagos Hub">Lagos Hub</option>
+              <option value="Warri Hub">Warri Hub</option>
+              <option value="Abuja Hub">Abuja Hub</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Product Total (₦) <span class="required">*</span></label>
+            <input 
+              type="number" 
+              class="form-input" 
+              id="newProductTotal" 
+              required 
+              min="0" 
+              step="0.01"
+              onchange="calculateBreakdown()"
+            />
+            <div class="form-help">Total value of products sold</div>
+          </div>
+
+          <!-- Breakdown Display -->
+          <div id="breakdownDisplay" style="display: none; background: var(--bg-gray); padding: 16px; border-radius: 8px; margin-top: 16px;">
+            <h4 style="margin-bottom: 12px; font-size: 14px;">Payment Breakdown</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+              <div style="display: flex; justify-content: space-between;">
+                <span>Product Total:</span>
+                <strong id="breakdownTotal">₦0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; color: var(--danger);">
+                <span>Commission (5%):</span>
+                <strong id="breakdownCommission">₦0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border);">
+                <span>Vendor Earnings:</span>
+                <strong id="breakdownEarnings">₦0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; color: var(--warning); margin-top: 8px;">
+                <span>Advance (40%):</span>
+                <strong id="breakdownAdvance">₦0.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; color: var(--success);">
+                <span>Balance (60%):</span>
+                <strong id="breakdownBalance">₦0.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Order Reference</label>
+            <input type="text" class="form-input" id="newOrderReference" placeholder="JLM-1234" />
+            <div class="form-help">Optional reference number</div>
+          </div>
+
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea class="form-textarea" id="newNotes" placeholder="Additional notes..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeNewPaymentModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="document.getElementById('newPaymentForm').requestSubmit()">
+          Save Payment Record
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pay Advance Modal -->
+  <div class="modal" id="payAdvanceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Pay Advance Payment</h3>
+      </div>
+      <div class="modal-body">
+        <form id="payAdvanceForm" onsubmit="handlePayAdvance(event)">
+          <input type="hidden" id="advancePaymentId" />
+          
+          <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Order:</span>
+              <strong id="advanceOrderId"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Vendor:</span>
+              <strong id="advanceVendor"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Bank Details:</span>
+              <strong id="advanceBankDetails" style="text-align: right; max-width: 260px; white-space: normal;">Loading...</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 18px; color: var(--warning); padding-top: 8px; border-top: 1px solid var(--border);">
+              <span>Advance Amount (40%):</span>
+              <strong id="advanceAmount"></strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method <span class="required">*</span></label>
+            <select class="form-select" id="advancePaymentMethod" required>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Cash">Cash</option>
+              <option value="Paystack">Paystack</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Reference <span class="required">*</span></label>
+            <input type="text" class="form-input" id="advancePaymentReference" required placeholder="e.g., TRX123456789" />
+            <div class="form-help">Bank transfer reference, transaction ID, etc.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="advancePaymentDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea class="form-textarea" id="advanceNotes" placeholder="Additional notes..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePayAdvanceModal()">Cancel</button>
+        <button class="btn btn-success" onclick="document.getElementById('payAdvanceForm').requestSubmit()">
+          ✅ Confirm Payment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mark Hub Received Modal -->
+  <div class="modal" id="markHubReceivedModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Mark Hub Received</h3>
+      </div>
+      <div class="modal-body">
+        <form id="markHubReceivedForm" onsubmit="handleMarkHubReceived(event)">
+          <input type="hidden" id="hubReceivedPaymentId" />
+          
+          <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Order:</span>
+              <strong id="hubReceivedOrderId"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Vendor:</span>
+              <strong id="hubReceivedVendor"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Hub:</span>
+              <strong id="hubReceivedHub"></strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Received Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="hubReceivedDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Received By <span class="required">*</span></label>
+            <input type="text" class="form-input" id="hubReceivedBy" required placeholder="Staff name" />
+            <div class="form-help">Name of staff member who received the item</div>
+          </div>
+
+          <div class="form-group">
+            <label>Item Condition Notes</label>
+            <textarea class="form-textarea" id="hubReceivedNotes" placeholder="Note any visible damage or issues..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeMarkHubReceivedModal()">Cancel</button>
+        <button class="btn btn-success" onclick="document.getElementById('markHubReceivedForm').requestSubmit()">
+          ✅ Confirm Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verify Item Modal -->
+  <div class="modal" id="verifyItemModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Verify Item at Hub</h3>
+      </div>
+      <div class="modal-body">
+        <form id="verifyItemForm" onsubmit="handleVerifyItem(event)">
+          <input type="hidden" id="verifyPaymentId" />
+          
+          <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Order:</span>
+              <strong id="verifyOrderId"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Vendor:</span>
+              <strong id="verifyVendor"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Hub:</span>
+              <strong id="verifyHub"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border);">
+              <span>Received On:</span>
+              <strong id="verifyReceivedDate"></strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Item Condition <span class="required">*</span></label>
+            <select class="form-select" id="verifyCondition" required>
+              <option value="">Select condition...</option>
+              <option value="good">✅ Good - Item matches description</option>
+              <option value="damaged">⚠️ Damaged - Item has issues</option>
+              <option value="wrong">❌ Wrong Item - Does not match order</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Quality Checks</label>
+            <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--bg-gray); border-radius: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                <input type="checkbox" id="checkMatchesDescription" style="width: auto;" />
+                Matches product description
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                <input type="checkbox" id="checkPackaging" style="width: auto;" />
+                Original packaging intact
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                <input type="checkbox" id="checkNoDamage" style="width: auto;" />
+                No visible damage
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                <input type="checkbox" id="checkQuantity" style="width: auto;" />
+                Correct quantity
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Verified By <span class="required">*</span></label>
+            <input type="text" class="form-input" id="verifiedBy" required placeholder="Staff name" />
+          </div>
+
+          <div class="form-group">
+            <label>Verification Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="verifiedDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Verification Notes <span class="required">*</span></label>
+            <textarea class="form-textarea" id="verificationNotes" required placeholder="Detailed notes about item condition..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeVerifyItemModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="handleRejectItem()">
+          ❌ Reject Item
+        </button>
+        <button class="btn btn-success" onclick="document.getElementById('verifyItemForm').requestSubmit()">
+          ✅ Approve & Mark Balance Ready
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pay Balance Modal -->
+  <div class="modal" id="payBalanceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Pay Balance Payment</h3>
+      </div>
+      <div class="modal-body">
+        <form id="payBalanceForm" onsubmit="handlePayBalance(event)">
+          <input type="hidden" id="balancePaymentId" />
+          
+          <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Order:</span>
+              <strong id="balanceOrderId"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Vendor:</span>
+              <strong id="balanceVendor"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Bank Details:</span>
+              <strong id="balanceBankDetails" style="text-align: right; max-width: 260px; white-space: normal;">Loading...</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Advance Paid:</span>
+              <strong id="balanceAdvancePaid" style="color: var(--success);"></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 18px; color: var(--success); padding-top: 8px; border-top: 1px solid var(--border);">
+              <span>Balance Amount (60%):</span>
+              <strong id="balanceAmount"></strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method <span class="required">*</span></label>
+            <select class="form-select" id="balancePaymentMethod" required>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Cash">Cash</option>
+              <option value="Paystack">Paystack</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Reference <span class="required">*</span></label>
+            <input type="text" class="form-input" id="balancePaymentReference" required placeholder="e.g., TRX123456789" />
+            <div class="form-help">Bank transfer reference, transaction ID, etc.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="balancePaymentDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea class="form-textarea" id="balanceNotes" placeholder="Additional notes..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePayBalanceModal()">Cancel</button>
+        <button class="btn btn-success" onclick="document.getElementById('payBalanceForm').requestSubmit()">
+          ✅ Confirm Payment & Complete Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Payment Details Modal -->
+  <div class="modal" id="viewDetailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Payment Details</h3>
+      </div>
+      <div class="modal-body" id="viewDetailsContent">
+        <!-- Content will be populated dynamically -->
+      </div>
+      <div class="modal-footer" id="viewDetailsFooter">
+        <button class="btn btn-secondary" onclick="closeViewDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setupSidebar() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const closeBtn = document.getElementById('sidebarClose');
+      if (!menuToggle || !sidebar || !backdrop || !closeBtn) return;
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+      }
+
+      menuToggle.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      backdrop.addEventListener('click', closeSidebar);
+      sidebar.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('click', closeSidebar);
+      });
+    }
+
+    logoManager.init({
+      logoElementId: 'headerLogo',
+      titleElementId: 'headerTitle',
+      fallbackText: 'Admin Portal',
+      pageType: 'Admin Payments'
+    });
+
+    setupSidebar();
+    // Global variables
+    let allPayments = [];
+    let filteredPayments = [];
+    let allVendors = [];
+    let currentAdminUser = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      const authed = await authManager.initAuthCheck();
+      if (!authed) return;
+      currentAdminUser = authManager.getUserData();
+      if (!currentAdminUser || currentAdminUser.role !== 'admin') {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // Set today's date as default
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('newOrderDate').value = today;
+      if (document.getElementById('advancePaymentDate')) {
+        document.getElementById('advancePaymentDate').value = today;
+      }
+
+      // Load data
+      await loadVendors();
+      await loadPayments();
+      
+      // Update stats
+      updateStats();
+    }
+
+    async function loadVendors() {
+      try {
+        const sb = PaymentSystem.getSupabase();
+        const { data, error } = await sb
+          .from('vendors')
+          .select('vendor_code, vendor_name')
+          .order('vendor_name', { ascending: true });
+
+        if (error) throw error;
+
+        allVendors = data || [];
+        
+        // Populate vendor dropdowns
+        const vendorSelects = ['vendorFilter', 'newVendorCode'];
+        vendorSelects.forEach(selectId => {
+          const select = document.getElementById(selectId);
+          if (select && selectId !== 'vendorFilter') {
+            select.innerHTML = '<option value="">Select vendor...</option>';
+          }
+          
+          allVendors.forEach(vendor => {
+            const option = document.createElement('option');
+            option.value = vendor.vendor_code;
+            option.textContent = `${vendor.vendor_code} - ${vendor.vendor_name}`;
+            select.appendChild(option);
+          });
+        });
+      } catch (error) {
+        console.error('Error loading vendors:', error);
+        PaymentSystem.showToast('Failed to load vendors', 'error');
+      }
+    }
+
+    async function loadPayments() {
+      try {
+        PaymentSystem.showLoading('Loading payments...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        // Get all payments (vendor info already in vendor_code field)
+        const { data: payments, error } = await sb
+          .from('vendor_payments')
+          .select('*')
+          .order('order_date', { ascending: false });
+
+        if (error) throw error;
+
+        // Get vendor names separately if needed
+        const vendorCodes = [...new Set(payments.map(p => p.vendor_code))];
+        const { data: vendors } = await sb
+          .from('vendors')
+          .select('vendor_code, vendor_name, email')
+          .in('vendor_code', vendorCodes);
+
+        // Create vendor lookup map
+        const vendorMap = {};
+        if (vendors) {
+          vendors.forEach(v => {
+            vendorMap[v.vendor_code] = v;
+          });
+        }
+
+        // Merge vendor data
+        allPayments = payments.map(p => ({
+          ...p,
+          vendor_name: vendorMap[p.vendor_code]?.vendor_name || p.vendor_code,
+          vendor_email: vendorMap[p.vendor_code]?.email || ''
+        }));
+
+        filteredPayments = [...allPayments];
+        renderPayments();
+        updateStats();
+        
+        PaymentSystem.hideLoading();
+      } catch (error) {
+        console.error('Error loading payments:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to load payments', 'error');
+      }
+    }
+
+    function renderPayments() {
+      const tbody = document.getElementById('paymentsTable');
+      
+      if (filteredPayments.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10">
+              <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3>No payments found</h3>
+                <p>Click "Record New Order" to create your first payment record</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filteredPayments.map(payment => {
+        const nextAction = PaymentSystem.getNextAction(payment);
+        
+        return `
+          <tr>
+            <td><strong>#${payment.order_id}</strong></td>
+            <td class="col-mobile-hidden">${PaymentSystem.formatDate(payment.order_date)}</td>
+            <td>
+              <div style="font-weight: 600;">${payment.vendor_code}</div>
+              <div style="font-size: 12px; color: var(--text-light);">${payment.vendor_name}</div>
+              <details class="row-details">
+                <summary>View more</summary>
+                <div class="detail-item"><span>Date:</span><span>${PaymentSystem.formatDate(payment.order_date)}</span></div>
+                <div class="detail-item"><span>Hub:</span><span>${payment.hub_name || '-'}</span></div>
+                <div class="detail-item"><span>Total:</span><span>${PaymentSystem.formatCurrency(payment.product_total)}</span></div>
+                <div class="detail-item"><span>Earnings:</span><span>${PaymentSystem.formatCurrency(payment.vendor_earnings)}</span></div>
+                <div class="detail-item"><span>Advance:</span><span>${PaymentSystem.formatCurrency(payment.advance_amount)} ${payment.advance_paid ? '(Paid)' : '(Pending)'}</span></div>
+                <div class="detail-item"><span>Balance:</span><span>${PaymentSystem.formatCurrency(payment.balance_amount)} ${payment.balance_paid ? '(Paid)' : '(Pending)'}</span></div>
+                <div class="detail-actions">
+                  ${nextAction.action !== 'view_only' ? `
+                    <button class="btn" style="background: ${nextAction.color}; color: white; padding: 6px 12px;" onclick="handleAction('${nextAction.action}', '${payment.id}')">
+                      ${nextAction.label}
+                    </button>
+                  ` : `
+                    <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="viewPaymentDetails('${payment.id}')">View</button>
+                  `}
+                </div>
+              </details>
+            </td>
+            <td class="col-mobile-hidden">${payment.hub_name || '-'}</td>
+            <td class="col-mobile-hidden">${PaymentSystem.formatCurrency(payment.product_total)}</td>
+            <td class="col-mobile-hidden">${PaymentSystem.formatCurrency(payment.vendor_earnings)}</td>
+            <td class="col-mobile-hidden">
+              <div>${PaymentSystem.formatCurrency(payment.advance_amount)}</div>
+              <div style="font-size: 11px; color: ${payment.advance_paid ? 'var(--success)' : 'var(--warning)'};">
+                ${payment.advance_paid ? '✅ Paid' : '⏳ Pending'}
+              </div>
+            </td>
+            <td class="col-mobile-hidden">
+              <div>${PaymentSystem.formatCurrency(payment.balance_amount)}</div>
+              <div style="font-size: 11px; color: ${payment.balance_paid ? 'var(--success)' : 'var(--text-light)'};">
+                ${payment.balance_paid ? '✅ Paid' : '⏳ Pending'}
+              </div>
+            </td>
+            <td>${PaymentSystem.getStatusBadge(payment.payment_status)}</td>
+            <td class="col-mobile-hidden">
+              ${nextAction.action !== 'view_only' ? `
+                <button 
+                  class="btn" 
+                  style="background: ${nextAction.color}; color: white; padding: 6px 12px;"
+                  onclick="handleAction('${nextAction.action}', '${payment.id}')"
+                >
+                  ${nextAction.label}
+                </button>
+              ` : `
+                <button 
+                  class="btn btn-secondary" 
+                  style="padding: 6px 12px;"
+                  onclick="viewPaymentDetails('${payment.id}')"
+                >
+                  View
+                </button>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateStats() {
+      // Pending Advance
+      const pendingAdvance = allPayments.filter(p => p.payment_status === 'pending_advance');
+      document.getElementById('statPendingAdvance').textContent = pendingAdvance.length;
+      const pendingAdvanceAmount = pendingAdvance.reduce((sum, p) => sum + parseFloat(p.advance_amount), 0);
+      document.getElementById('statPendingAdvanceAmount').textContent = PaymentSystem.formatCurrency(pendingAdvanceAmount);
+
+      // At Hub
+      const atHub = allPayments.filter(p => p.payment_status === 'hub_pending');
+      document.getElementById('statAtHub').textContent = atHub.length;
+
+      // Balance Ready
+      const balanceReady = allPayments.filter(p => p.payment_status === 'hub_verified');
+      document.getElementById('statBalanceReady').textContent = balanceReady.length;
+      const balanceReadyAmount = balanceReady.reduce((sum, p) => sum + parseFloat(p.balance_amount), 0);
+      document.getElementById('statBalanceReadyAmount').textContent = PaymentSystem.formatCurrency(balanceReadyAmount);
+
+      // Completed Today
+      const today = new Date().toISOString().split('T')[0];
+      const completedToday = allPayments.filter(p => {
+        const completedDate = p.balance_paid_date || p.updated_at;
+        return p.payment_status === 'completed' && completedDate && completedDate.startsWith(today);
+      });
+      document.getElementById('statCompletedToday').textContent = completedToday.length;
+      const completedTodayAmount = completedToday.reduce((sum, p) => sum + parseFloat(p.vendor_earnings), 0);
+      document.getElementById('statCompletedTodayAmount').textContent = PaymentSystem.formatCurrency(completedTodayAmount);
+    }
+
+    function filterPayments() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const vendor = document.getElementById('vendorFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const hub = document.getElementById('hubFilter').value;
+
+      filteredPayments = allPayments.filter(payment => {
+        const matchesSearch = !search || 
+          payment.order_id.toString().includes(search) ||
+          payment.vendor_code.toLowerCase().includes(search) ||
+          payment.vendor_name.toLowerCase().includes(search) ||
+          (payment.order_reference && payment.order_reference.toLowerCase().includes(search));
+        
+        const matchesVendor = !vendor || payment.vendor_code === vendor;
+        const matchesStatus = !status || payment.payment_status === status;
+        const matchesHub = !hub || payment.hub_name === hub;
+
+        return matchesSearch && matchesVendor && matchesStatus && matchesHub;
+      });
+
+      renderPayments();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('vendorFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('hubFilter').value = '';
+      filterPayments();
+    }
+
+    // Modal functions
+    function openNewPaymentModal() {
+      document.getElementById('newPaymentModal').classList.add('active');
+      document.getElementById('newPaymentForm').reset();
+      document.getElementById('newOrderDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('breakdownDisplay').style.display = 'none';
+    }
+
+    function closeNewPaymentModal() {
+      document.getElementById('newPaymentModal').classList.remove('active');
+    }
+
+    function calculateBreakdown() {
+      const total = parseFloat(document.getElementById('newProductTotal').value) || 0;
+      
+      if (total > 0) {
+        const breakdown = PaymentSystem.calculatePaymentBreakdown(total);
+        
+        document.getElementById('breakdownTotal').textContent = PaymentSystem.formatCurrency(breakdown.productTotal);
+        document.getElementById('breakdownCommission').textContent = PaymentSystem.formatCurrency(breakdown.commissionAmount);
+        document.getElementById('breakdownEarnings').textContent = PaymentSystem.formatCurrency(breakdown.vendorEarnings);
+        document.getElementById('breakdownAdvance').textContent = PaymentSystem.formatCurrency(breakdown.advanceAmount);
+        document.getElementById('breakdownBalance').textContent = PaymentSystem.formatCurrency(breakdown.balanceAmount);
+        
+        document.getElementById('breakdownDisplay').style.display = 'block';
+      } else {
+        document.getElementById('breakdownDisplay').style.display = 'none';
+      }
+    }
+
+    async function handleNewPayment(event) {
+      event.preventDefault();
+      
+      const formData = {
+        order_id: parseInt(document.getElementById('newOrderId').value),
+        order_date: document.getElementById('newOrderDate').value,
+        vendor_code: document.getElementById('newVendorCode').value,
+        hub_name: document.getElementById('newHubName').value,
+        product_total: parseFloat(document.getElementById('newProductTotal').value),
+        order_reference: document.getElementById('newOrderReference').value,
+        notes: document.getElementById('newNotes').value
+      };
+
+      // Validate
+      const validation = PaymentSystem.validatePaymentData(formData);
+      if (!validation.isValid) {
+        PaymentSystem.showToast(validation.errors[0], 'error');
+        return;
+      }
+
+      // Calculate breakdown
+      const breakdown = PaymentSystem.calculatePaymentBreakdown(formData.product_total);
+
+      try {
+        PaymentSystem.showLoading('Creating payment record...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        const { data, error } = await sb
+          .from('vendor_payments')
+          .insert([{
+            order_id: formData.order_id,
+            order_date: formData.order_date,
+            vendor_code: formData.vendor_code,
+            hub_name: formData.hub_name,
+            order_reference: formData.order_reference || null,
+            product_total: breakdown.productTotal,
+            commission_rate: breakdown.commissionRate,
+            commission_amount: breakdown.commissionAmount,
+            vendor_earnings: breakdown.vendorEarnings,
+            advance_percentage: breakdown.advancePercentage,
+            advance_amount: breakdown.advanceAmount,
+            balance_percentage: breakdown.balancePercentage,
+            balance_amount: breakdown.balanceAmount,
+            payment_status: 'pending_advance',
+            notes: formData.notes || null,
+            created_by: currentAdminUser.email
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Payment record created successfully', 'success');
+        closeNewPaymentModal();
+        await loadPayments();
+      } catch (error) {
+        console.error('Error creating payment:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to create payment record', 'error');
+      }
+    }
+
+    function handleAction(action, paymentId) {
+      switch (action) {
+        case 'pay_advance':
+          openPayAdvanceModal(paymentId);
+          break;
+        case 'mark_hub_received':
+          openMarkHubReceivedModal(paymentId);
+          break;
+        case 'verify_item':
+          openVerifyItemModal(paymentId);
+          break;
+        case 'pay_balance':
+          openPayBalanceModal(paymentId);
+          break;
+      }
+    }
+
+    async function loadVendorBankDetails(vendorCode, targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.textContent = 'Loading...';
+
+      try {
+        const sb = PaymentSystem.getSupabase();
+        if (!sb) throw new Error('Database not connected');
+
+        const { data, error } = await sb
+          .from('vendor_bank_details')
+          .select('bank_name, bank_code, account_number, account_name, is_primary, updated_at')
+          .eq('vendor_code', vendorCode)
+          .order('is_primary', { ascending: false })
+          .order('updated_at', { ascending: false })
+          .limit(1);
+
+        if (error) throw error;
+
+        const details = data && data.length ? data[0] : null;
+        if (!details) {
+          target.textContent = 'Not provided';
+          return;
+        }
+
+        const account = details.account_number ? ` • ${details.account_number}` : '';
+        const name = details.account_name ? ` (${details.account_name})` : '';
+        const primary = details.is_primary ? ' [Primary]' : '';
+        target.textContent = `${details.bank_name}${account}${name}${primary}`;
+      } catch (error) {
+        console.error('Error loading bank details:', error);
+        target.textContent = 'Unavailable';
+      }
+    }
+
+    function openPayAdvanceModal(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      document.getElementById('advancePaymentId').value = paymentId;
+      document.getElementById('advanceOrderId').textContent = `#${payment.order_id}`;
+      document.getElementById('advanceVendor').textContent = `${payment.vendor_code} - ${payment.vendor_name}`;
+      document.getElementById('advanceAmount').textContent = PaymentSystem.formatCurrency(payment.advance_amount);
+      document.getElementById('advancePaymentDate').value = new Date().toISOString().split('T')[0];
+      loadVendorBankDetails(payment.vendor_code, 'advanceBankDetails');
+      
+      document.getElementById('payAdvanceModal').classList.add('active');
+    }
+
+    function closePayAdvanceModal() {
+      document.getElementById('payAdvanceModal').classList.remove('active');
+      document.getElementById('payAdvanceForm').reset();
+    }
+
+    async function handlePayAdvance(event) {
+      event.preventDefault();
+      
+      const paymentId = document.getElementById('advancePaymentId').value;
+      const paymentMethod = document.getElementById('advancePaymentMethod').value;
+      const paymentReference = document.getElementById('advancePaymentReference').value;
+      const paymentDate = document.getElementById('advancePaymentDate').value;
+      const notes = document.getElementById('advanceNotes').value;
+
+      // Validate reference
+      const refValidation = PaymentSystem.validatePaymentReference(paymentReference);
+      if (!refValidation.isValid) {
+        PaymentSystem.showToast(refValidation.error, 'error');
+        return;
+      }
+
+      try {
+        PaymentSystem.showLoading('Processing payment...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        // Get payment details
+        const { data: payment } = await sb
+          .from('vendor_payments')
+          .select('*')
+          .eq('id', paymentId)
+          .single();
+
+        // Update payment record
+        const { error: updateError } = await sb
+          .from('vendor_payments')
+          .update({
+            advance_paid: true,
+            advance_paid_date: paymentDate,
+            advance_payment_method: paymentMethod,
+            advance_payment_reference: paymentReference,
+            payment_status: 'advance_paid',
+            updated_by: currentAdminUser.email
+          })
+          .eq('id', paymentId);
+
+        if (updateError) throw updateError;
+
+        // Create transaction record
+        const { error: txError } = await sb
+          .from('payment_transactions')
+          .insert([{
+            payment_id: paymentId,
+            vendor_code: payment.vendor_code,
+            transaction_type: 'advance',
+            amount: payment.advance_amount,
+            payment_method: paymentMethod,
+            payment_reference: paymentReference,
+            status: 'completed',
+            processed_by: currentAdminUser.email,
+            notes: notes || null
+          }]);
+
+        if (txError) throw txError;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Advance payment recorded successfully', 'success');
+        closePayAdvanceModal();
+        await loadPayments();
+      } catch (error) {
+        console.error('Error recording advance payment:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to record payment', 'error');
+      }
+    }
+
+    function exportPayments() {
+      if (filteredPayments.length === 0) {
+        PaymentSystem.showToast('No payments to export', 'warning');
+        return;
+      }
+
+      const exportData = filteredPayments.map(p => ({
+        'Order ID': p.order_id,
+        'Date': PaymentSystem.formatDate(p.order_date),
+        'Vendor Code': p.vendor_code,
+        'Vendor Name': p.vendor_name,
+        'Hub': p.hub_name || '',
+        'Product Total': p.product_total,
+        'Commission': p.commission_amount,
+        'Vendor Earnings': p.vendor_earnings,
+        'Advance Amount': p.advance_amount,
+        'Advance Paid': p.advance_paid ? 'Yes' : 'No',
+        'Advance Date': PaymentSystem.formatDate(p.advance_paid_date),
+        'Balance Amount': p.balance_amount,
+        'Balance Paid': p.balance_paid ? 'Yes' : 'No',
+        'Balance Date': PaymentSystem.formatDate(p.balance_paid_date),
+        'Status': p.payment_status,
+        'Reference': p.order_reference || ''
+      }));
+
+      PaymentSystem.exportToCSV(exportData, `payments-${new Date().toISOString().split('T')[0]}.csv`);
+    }
+
+    function openMarkHubReceivedModal(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      document.getElementById('hubReceivedPaymentId').value = paymentId;
+      document.getElementById('hubReceivedOrderId').textContent = `#${payment.order_id}`;
+      document.getElementById('hubReceivedVendor').textContent = `${payment.vendor_code} - ${payment.vendor_name}`;
+      document.getElementById('hubReceivedHub').textContent = payment.hub_name || '-';
+      document.getElementById('hubReceivedDate').value = new Date().toISOString().split('T')[0];
+      
+      document.getElementById('markHubReceivedModal').classList.add('active');
+    }
+
+    function closeMarkHubReceivedModal() {
+      document.getElementById('markHubReceivedModal').classList.remove('active');
+      document.getElementById('markHubReceivedForm').reset();
+    }
+
+    async function handleMarkHubReceived(event) {
+      event.preventDefault();
+      
+      const paymentId = document.getElementById('hubReceivedPaymentId').value;
+      const receivedDate = document.getElementById('hubReceivedDate').value;
+      const receivedBy = document.getElementById('hubReceivedBy').value;
+      const notes = document.getElementById('hubReceivedNotes').value;
+
+      try {
+        PaymentSystem.showLoading('Marking hub received...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        const { error } = await sb
+          .from('vendor_payments')
+          .update({
+            hub_received: true,
+            hub_received_date: receivedDate,
+            hub_received_by: receivedBy,
+            payment_status: 'hub_pending',
+            notes: notes || null,
+            updated_by: currentAdminUser.email
+          })
+          .eq('id', paymentId);
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Item marked as received at hub', 'success');
+        closeMarkHubReceivedModal();
+        await loadPayments();
+      } catch (error) {
+        console.error('Error marking hub received:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to mark as received', 'error');
+      }
+    }
+
+    function openVerifyItemModal(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      document.getElementById('verifyPaymentId').value = paymentId;
+      document.getElementById('verifyOrderId').textContent = `#${payment.order_id}`;
+      document.getElementById('verifyVendor').textContent = `${payment.vendor_code} - ${payment.vendor_name}`;
+      document.getElementById('verifyHub').textContent = payment.hub_name || '-';
+      document.getElementById('verifyReceivedDate').textContent = PaymentSystem.formatDate(payment.hub_received_date);
+      document.getElementById('verifiedDate').value = new Date().toISOString().split('T')[0];
+      
+      document.getElementById('verifyItemModal').classList.add('active');
+    }
+
+    function closeVerifyItemModal() {
+      document.getElementById('verifyItemModal').classList.remove('active');
+      document.getElementById('verifyItemForm').reset();
+    }
+
+    async function handleVerifyItem(event) {
+      event.preventDefault();
+      
+      const paymentId = document.getElementById('verifyPaymentId').value;
+      const condition = document.getElementById('verifyCondition').value;
+      const verifiedBy = document.getElementById('verifiedBy').value;
+      const verifiedDate = document.getElementById('verifiedDate').value;
+      const notes = document.getElementById('verificationNotes').value;
+
+      if (condition !== 'good') {
+        PaymentSystem.showToast('Please reject the item if condition is not good', 'warning');
+        return;
+      }
+
+      // Build quality check notes
+      const checks = [];
+      if (document.getElementById('checkMatchesDescription').checked) checks.push('Matches description');
+      if (document.getElementById('checkPackaging').checked) checks.push('Original packaging');
+      if (document.getElementById('checkNoDamage').checked) checks.push('No damage');
+      if (document.getElementById('checkQuantity').checked) checks.push('Correct quantity');
+      
+      const fullNotes = `${notes}\n\nQuality Checks: ${checks.join(', ') || 'None checked'}`;
+
+      try {
+        PaymentSystem.showLoading('Verifying item...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        const { error } = await sb
+          .from('vendor_payments')
+          .update({
+            hub_verified: true,
+            hub_verified_date: verifiedDate,
+            hub_verified_by: verifiedBy,
+            hub_verification_notes: fullNotes,
+            payment_status: 'hub_verified',
+            updated_by: currentAdminUser.email
+          })
+          .eq('id', paymentId);
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Item verified successfully! Balance payment now available.', 'success');
+        closeVerifyItemModal();
+        await loadPayments();
+      } catch (error) {
+        console.error('Error verifying item:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to verify item', 'error');
+      }
+    }
+
+    async function handleRejectItem() {
+      const paymentId = document.getElementById('verifyPaymentId').value;
+      const notes = document.getElementById('verificationNotes').value;
+
+      if (!notes) {
+        PaymentSystem.showToast('Please provide rejection reason in notes', 'error');
+        return;
+      }
+
+      const confirmed = await PaymentSystem.showConfirm(
+        'Reject Item',
+        'Are you sure you want to reject this item? This will mark the payment as rejected.'
+      );
+
+      if (!confirmed) return;
+
+      try {
+        PaymentSystem.showLoading('Rejecting item...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        const { error } = await sb
+          .from('vendor_payments')
+          .update({
+            hub_verified: false,
+            hub_verification_notes: `REJECTED: ${notes}`,
+            payment_status: 'rejected',
+            updated_by: currentAdminUser.email
+          })
+          .eq('id', paymentId);
+
+        if (error) throw error;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Item rejected', 'success');
+        closeVerifyItemModal();
+        await loadPayments();
+      } catch (error) {
+        console.error('Error rejecting item:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to reject item', 'error');
+      }
+    }
+
+    function openPayBalanceModal(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      document.getElementById('balancePaymentId').value = paymentId;
+      document.getElementById('balanceOrderId').textContent = `#${payment.order_id}`;
+      document.getElementById('balanceVendor').textContent = `${payment.vendor_code} - ${payment.vendor_name}`;
+      document.getElementById('balanceAdvancePaid').textContent = `${PaymentSystem.formatCurrency(payment.advance_amount)} (Paid ${PaymentSystem.formatDate(payment.advance_paid_date)})`;
+      document.getElementById('balanceAmount').textContent = PaymentSystem.formatCurrency(payment.balance_amount);
+      document.getElementById('balancePaymentDate').value = new Date().toISOString().split('T')[0];
+      loadVendorBankDetails(payment.vendor_code, 'balanceBankDetails');
+      
+      document.getElementById('payBalanceModal').classList.add('active');
+    }
+
+    function closePayBalanceModal() {
+      document.getElementById('payBalanceModal').classList.remove('active');
+      document.getElementById('payBalanceForm').reset();
+    }
+
+    async function handlePayBalance(event) {
+      event.preventDefault();
+      
+      const paymentId = document.getElementById('balancePaymentId').value;
+      const paymentMethod = document.getElementById('balancePaymentMethod').value;
+      const paymentReference = document.getElementById('balancePaymentReference').value;
+      const paymentDate = document.getElementById('balancePaymentDate').value;
+      const notes = document.getElementById('balanceNotes').value;
+
+      // Validate reference
+      const refValidation = PaymentSystem.validatePaymentReference(paymentReference);
+      if (!refValidation.isValid) {
+        PaymentSystem.showToast(refValidation.error, 'error');
+        return;
+      }
+
+      try {
+        PaymentSystem.showLoading('Processing balance payment...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        // Get payment details
+        const { data: payment } = await sb
+          .from('vendor_payments')
+          .select('*')
+          .eq('id', paymentId)
+          .single();
+
+        // Update payment record
+        const { error: updateError } = await sb
+          .from('vendor_payments')
+          .update({
+            balance_paid: true,
+            balance_paid_date: paymentDate,
+            balance_payment_method: paymentMethod,
+            balance_payment_reference: paymentReference,
+            payment_status: 'completed',
+            updated_by: currentAdminUser.email
+          })
+          .eq('id', paymentId);
+
+        if (updateError) throw updateError;
+
+        // Create transaction record
+        const { error: txError } = await sb
+          .from('payment_transactions')
+          .insert([{
+            payment_id: paymentId,
+            vendor_code: payment.vendor_code,
+            transaction_type: 'balance',
+            amount: payment.balance_amount,
+            payment_method: paymentMethod,
+            payment_reference: paymentReference,
+            status: 'completed',
+            processed_by: currentAdminUser.email,
+            notes: notes || null
+          }]);
+
+        if (txError) throw txError;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Balance payment completed! Order is now fully paid.', 'success');
+        closePayBalanceModal();
+        await loadPayments();
+        const updated = allPayments.find(p => p.id === paymentId);
+        if (updated) {
+          await openPaymentReceipt(updated);
+          if (confirm('Email the final receipt to the vendor now?')) {
+            await sendPaymentEmail(updated.id, 'balance_paid');
+          }
+        }
+      } catch (error) {
+        console.error('Error recording balance payment:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to record payment', 'error');
+      }
+    }
+
+    async function sendPaymentEmail(paymentId, emailType) {
+      try {
+        PaymentSystem.showLoading('Sending receipt email...');
+        const response = await fetch('/.netlify/functions/send-payment-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId, emailType })
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error || 'Failed to send email');
+        }
+        PaymentSystem.showToast(`Receipt emailed to ${payload.sentTo}`, 'success');
+      } catch (error) {
+        console.error('Error sending receipt email:', error);
+        PaymentSystem.showToast('Failed to send receipt email', 'error');
+      } finally {
+        PaymentSystem.hideLoading();
+      }
+    }
+
+    async function openPaymentReceipt(paymentOrId) {
+      const payment = typeof paymentOrId === 'object'
+        ? paymentOrId
+        : allPayments.find(p => p.id === paymentOrId);
+      if (!payment) return;
+
+      const logoMarkup = (window.logoManager && typeof logoManager.getLogoForPrint === 'function')
+        ? await logoManager.getLogoForPrint()
+        : '<div style="font-size: 20px; font-weight: 700; color: #2d1b69;">JulineMart</div>';
+
+      const receiptHtml = `
+        <div class="receipt">
+          <div class="receipt-header">
+            <div class="logo">${logoMarkup}</div>
+            <div class="receipt-title">
+              <div style="font-size: 18px; font-weight: 700;">Payment Receipt</div>
+              <div style="font-size: 12px; color: #6b7280;">Order #${payment.order_id}</div>
+            </div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Order Date:</span><strong>${PaymentSystem.formatDate(payment.order_date)}</strong></div>
+            <div class="row"><span>Vendor:</span><strong>${payment.vendor_code} - ${payment.vendor_name}</strong></div>
+            <div class="row"><span>Hub:</span><strong>${payment.hub_name || '-'}</strong></div>
+            <div class="row"><span>Reference:</span><strong>${payment.order_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Product Total:</span><strong>${PaymentSystem.formatCurrency(payment.product_total)}</strong></div>
+            <div class="row"><span>Commission (5%):</span><strong>-${PaymentSystem.formatCurrency(payment.commission_amount)}</strong></div>
+            <div class="row"><span>Vendor Earnings:</span><strong>${PaymentSystem.formatCurrency(payment.vendor_earnings)}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Advance Paid:</span><strong>${PaymentSystem.formatCurrency(payment.advance_amount)}</strong></div>
+            <div class="row"><span>Advance Date:</span><strong>${payment.advance_paid_date ? PaymentSystem.formatDate(payment.advance_paid_date) : '-'}</strong></div>
+            <div class="row"><span>Advance Method:</span><strong>${payment.advance_payment_method || '-'}</strong></div>
+            <div class="row"><span>Advance Reference:</span><strong>${payment.advance_payment_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section">
+            <div class="row"><span>Balance Paid:</span><strong>${PaymentSystem.formatCurrency(payment.balance_amount)}</strong></div>
+            <div class="row"><span>Balance Date:</span><strong>${payment.balance_paid_date ? PaymentSystem.formatDate(payment.balance_paid_date) : '-'}</strong></div>
+            <div class="row"><span>Balance Method:</span><strong>${payment.balance_payment_method || '-'}</strong></div>
+            <div class="row"><span>Balance Reference:</span><strong>${payment.balance_payment_reference || '-'}</strong></div>
+          </div>
+          <div class="receipt-section total">
+            <div class="row"><span>Status:</span><strong>Paid in Full</strong></div>
+          </div>
+        </div>
+      `;
+
+      const styles = `
+        @media print { @page { margin: 0; } body { margin: 1cm; } }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f5f5f5; }
+        .receipt { max-width: 640px; margin: 20px auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
+        .receipt-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 16px; }
+        .receipt-header .logo img { max-height: 48px; max-width: 160px; object-fit: contain; }
+        .receipt-section { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+        .receipt-section:last-child { border-bottom: none; }
+        .row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+        .total { background: #f9fafb; border-radius: 8px; padding: 12px; }
+      `;
+
+      const w = window.open('', '_blank', 'width=800,height=700');
+      w.document.write(`<!DOCTYPE html><html><head><title>Receipt #${payment.order_id}</title><style>${styles}</style></head><body>${receiptHtml}</body></html>`);
+      w.document.close();
+      w.focus();
+      w.print();
+    }
+
+    async function viewPaymentDetails(paymentId) {
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      try {
+        PaymentSystem.showLoading('Loading payment details...');
+        
+        const sb = PaymentSystem.getSupabase();
+        
+        // Get transactions for this payment
+        const { data: transactions } = await sb
+          .from('payment_transactions')
+          .select('*')
+          .eq('payment_id', paymentId)
+          .order('transaction_date', { ascending: false });
+
+        PaymentSystem.hideLoading();
+
+        const content = `
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Order Info -->
+            <div>
+              <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Order Information</h4>
+              <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Order ID:</span>
+                  <strong>#${payment.order_id}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Date:</span>
+                  <strong>${PaymentSystem.formatDate(payment.order_date)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Reference:</span>
+                  <strong>${payment.order_reference || '-'}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Vendor:</span>
+                  <strong>${payment.vendor_code} - ${payment.vendor_name}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Hub:</span>
+                  <strong>${payment.hub_name || '-'}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Breakdown -->
+            <div>
+              <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Financial Breakdown</h4>
+              <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Product Total:</span>
+                  <strong>${PaymentSystem.formatCurrency(payment.product_total)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: var(--danger);">
+                  <span>Commission (5%):</span>
+                  <strong>-${PaymentSystem.formatCurrency(payment.commission_amount)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border);">
+                  <span>Vendor Earnings:</span>
+                  <strong>${PaymentSystem.formatCurrency(payment.vendor_earnings)}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Split -->
+            <div>
+              <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Payment Split</h4>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Advance Payment -->
+                <div style="background: ${payment.advance_paid ? '#d1fae5' : '#fef3c7'}; padding: 16px; border-radius: 8px; border: 1px solid ${payment.advance_paid ? '#10b981' : '#f59e0b'};">
+                  <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 14px;">${payment.advance_paid ? '✅' : '⏳'} Advance Payment (40%)</span>
+                  </div>
+                  <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${PaymentSystem.formatCurrency(payment.advance_amount)}</div>
+                  ${payment.advance_paid ? `
+                    <div style="font-size: 13px; display: flex; flex-direction: column; gap: 4px;">
+                      <div>Paid: ${PaymentSystem.formatDate(payment.advance_paid_date)}</div>
+                      <div>Method: ${payment.advance_payment_method || '-'}</div>
+                      <div>Reference: ${payment.advance_payment_reference || '-'}</div>
+                    </div>
+                  ` : `
+                    <div style="font-size: 13px; color: #92400e;">Pending payment</div>
+                  `}
+                </div>
+
+                <!-- Balance Payment -->
+                <div style="background: ${payment.balance_paid ? '#d1fae5' : '#fef3c7'}; padding: 16px; border-radius: 8px; border: 1px solid ${payment.balance_paid ? '#10b981' : '#f59e0b'};">
+                  <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 14px;">${payment.balance_paid ? '✅' : '⏳'} Balance Payment (60%)</span>
+                  </div>
+                  <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${PaymentSystem.formatCurrency(payment.balance_amount)}</div>
+                  ${payment.balance_paid ? `
+                    <div style="font-size: 13px; display: flex; flex-direction: column; gap: 4px;">
+                      <div>Paid: ${PaymentSystem.formatDate(payment.balance_paid_date)}</div>
+                      <div>Method: ${payment.balance_payment_method || '-'}</div>
+                      <div>Reference: ${payment.balance_payment_reference || '-'}</div>
+                    </div>
+                  ` : `
+                    <div style="font-size: 13px; color: #92400e;">Pending payment</div>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Hub Status -->
+            <div>
+              <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Hub Status</h4>
+              <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Received at Hub:</span>
+                  <strong>${payment.hub_received ? `✅ Yes (${PaymentSystem.formatDate(payment.hub_received_date)})` : '⏳ No'}</strong>
+                </div>
+                ${payment.hub_received ? `
+                  <div style="display: flex; justify-content: space-between;">
+                    <span>Received By:</span>
+                    <strong>${payment.hub_received_by || '-'}</strong>
+                  </div>
+                ` : ''}
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Verified:</span>
+                  <strong>${payment.hub_verified ? `✅ Yes (${PaymentSystem.formatDate(payment.hub_verified_date)})` : '⏳ No'}</strong>
+                </div>
+                ${payment.hub_verified ? `
+                  <div style="display: flex; justify-content: space-between;">
+                    <span>Verified By:</span>
+                    <strong>${payment.hub_verified_by || '-'}</strong>
+                  </div>
+                ` : ''}
+                ${payment.hub_verification_notes ? `
+                  <div style="padding-top: 8px; border-top: 1px solid var(--border);">
+                    <div style="margin-bottom: 4px; font-weight: 600;">Verification Notes:</div>
+                    <div style="color: var(--text-light);">${payment.hub_verification_notes}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Current Status -->
+            <div>
+              <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Current Status</h4>
+              <div style="padding: 16px; background: var(--bg-gray); border-radius: 8px;">
+                ${PaymentSystem.getStatusBadge(payment.payment_status)}
+                <div style="margin-top: 8px; font-size: 13px; color: var(--text-light);">
+                  ${PaymentSystem.STATUS_CONFIG[payment.payment_status].description}
+                </div>
+              </div>
+            </div>
+
+            <!-- Transaction History -->
+            ${transactions && transactions.length > 0 ? `
+              <div>
+                <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Transaction History</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  ${transactions.map(tx => `
+                    <div style="padding: 12px; background: var(--bg-gray); border-radius: 8px; border-left: 4px solid ${tx.transaction_type === 'advance' ? 'var(--warning)' : 'var(--success)'};">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <strong style="text-transform: capitalize;">${tx.transaction_type} Payment</strong>
+                        <strong>${PaymentSystem.formatCurrency(tx.amount)}</strong>
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-light); display: flex; flex-direction: column; gap: 2px;">
+                        <div>Date: ${PaymentSystem.formatDateTime(tx.transaction_date)}</div>
+                        <div>Method: ${tx.payment_method}</div>
+                        <div>Reference: ${tx.payment_reference || '-'}</div>
+                        <div>Processed by: ${tx.processed_by}</div>
+                        ${tx.notes ? `<div>Notes: ${tx.notes}</div>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${payment.notes ? `
+              <div>
+                <h4 style="margin-bottom: 12px; color: var(--text); font-size: 16px;">Additional Notes</h4>
+                <div style="padding: 16px; background: var(--bg-gray); border-radius: 8px; color: var(--text-light); font-size: 14px;">
+                  ${payment.notes}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Audit Info -->
+            <div style="padding-top: 16px; border-top: 2px solid var(--border); font-size: 12px; color: var(--text-light);">
+              <div>Created: ${PaymentSystem.formatDateTime(payment.created_at)} ${payment.created_by ? `by ${payment.created_by}` : ''}</div>
+              <div>Last Updated: ${PaymentSystem.formatDateTime(payment.updated_at)} ${payment.updated_by ? `by ${payment.updated_by}` : ''}</div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('viewDetailsContent').innerHTML = content;
+        const footer = document.getElementById('viewDetailsFooter');
+        if (payment.balance_paid) {
+          footer.innerHTML = `
+            <button class="btn btn-secondary" id="closeViewDetailsBtn">Close</button>
+            <button class="btn btn-primary" id="printReceiptBtn">Print Receipt</button>
+            <button class="btn btn-success" id="emailReceiptBtn">Email Receipt</button>
+          `;
+          document.getElementById('closeViewDetailsBtn').addEventListener('click', closeViewDetailsModal);
+          document.getElementById('printReceiptBtn').addEventListener('click', () => openPaymentReceipt(payment.id));
+          document.getElementById('emailReceiptBtn').addEventListener('click', () => sendPaymentEmail(payment.id, 'balance_paid'));
+        } else {
+          footer.innerHTML = `<button class="btn btn-secondary" onclick="closeViewDetailsModal()">Close</button>`;
+        }
+        document.getElementById('viewDetailsModal').classList.add('active');
+      } catch (error) {
+        console.error('Error loading payment details:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to load payment details', 'error');
+      }
+    }
+
+    function closeViewDetailsModal() {
+      document.getElementById('viewDetailsModal').classList.remove('active');
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('jm_user');
+        window.location.href = '../index.html';
+      }
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

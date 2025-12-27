@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -45,17 +45,38 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 20px;
     }
     
-    .header-left {
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: white;
+    }
+
+    .header-right {
       display: flex;
       align-items: center;
       gap: 16px;
     }
     
-    .nav-links {
+    .portal-nav {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
     
     .nav-link {
@@ -78,9 +99,122 @@
     }
     
     .nav-link.active {
-  background: white;
-  color: var(--purple);
-}
+      background: white;
+      color: var(--purple);
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: rgba(239,68,68,0.2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239,68,68,0.35);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 120;
+    }
+
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+      transition: right 0.2s ease;
+      z-index: 130;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-close {
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .sidebar-link {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .sidebar-link.active {
+      background: #f5f3ff;
+      color: var(--purple);
+    }
+
+    .sidebar-link.logout {
+      color: #ef4444;
+      background: rgba(239,68,68,0.08);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
     
     .container {
       max-width: 1400px;
@@ -93,14 +227,14 @@
     }
     
     .page-header h1 {
-      font-size: 32px;
+      font-size: 14px;
       color: var(--text);
       margin-bottom: 8px;
     }
     
     .page-header p {
       color: var(--text-light);
-      font-size: 16px;
+      font-size: 12px;
     }
     
     .stats-grid {
@@ -133,6 +267,12 @@
     
     .stat-icon {
       font-size: 24px;
+    }
+
+    .stat-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
     
     .stat-value {
@@ -170,9 +310,14 @@
     }
     
     .card-title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text);
+    }
+
+    .card-header .btn {
+      font-size: 12px;
+      padding: 8px 12px;
     }
     
     .filters {
@@ -189,7 +334,7 @@
     }
     
     .filter-group label {
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 500;
       color: var(--text-light);
     }
@@ -198,12 +343,17 @@
       padding: 10px 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 10px;
     }
     
     .filter-input:focus, .filter-select:focus {
       outline: none;
       border-color: var(--purple);
+    }
+
+    .filters .btn {
+      font-size: 12px;
+      padding: 8px 12px;
     }
     
     .btn {
@@ -247,6 +397,48 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+    }
+
+    .row-details {
+      display: none;
+      margin-top: 6px;
+    }
+
+    .row-details summary {
+      cursor: pointer;
+      color: var(--purple);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .row-details .detail-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      padding: 2px 0;
+    }
+
+    .inventory-table {
+      table-layout: fixed;
+    }
+
+    .inventory-table th,
+    .inventory-table td {
+      vertical-align: middle;
+    }
+
+    .inventory-table th:nth-child(4),
+    .inventory-table td:nth-child(4),
+    .inventory-table th:nth-child(5),
+    .inventory-table td:nth-child(5),
+    .inventory-table th:nth-child(6),
+    .inventory-table td:nth-child(6),
+    .inventory-table th:nth-child(7),
+    .inventory-table td:nth-child(7),
+    .inventory-table th:nth-child(8),
+    .inventory-table td:nth-child(8) {
+      white-space: nowrap;
     }
     
     th {
@@ -336,28 +528,127 @@
     }
     
     .empty-state-icon {
-      font-size: 64px;
       margin-bottom: 16px;
+      color: var(--text-light);
+    }
+
+    .empty-state-icon svg {
+      width: 48px;
+      height: 48px;
+      display: inline-block;
     }
     
     @media (max-width: 768px) {
       .header-content {
-        flex-direction: column;
+        flex-direction: row;
         gap: 12px;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .header-title {
+        font-size: 16px;
       }
       
       .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat-card {
+        padding: 8px;
+      }
+
+      .stat-label {
+        font-size: 10px;
+      }
+
+      .stat-value {
+        font-size: 16px;
+      }
+
+      .stat-icon {
+        display: none;
       }
       
       .filters {
-        flex-direction: column;
+        flex-direction: row;
         width: 100%;
+        gap: 8px;
       }
       
       .filter-input, .filter-select {
         width: 100%;
+      }
+
+      .table-container {
+        overflow-x: visible;
+      }
+
+      table {
+        font-size: 9px;
+      }
+
+      th,
+      td {
+        padding: 8px 10px;
+      }
+
+      .inventory-table {
+        table-layout: fixed;
+      }
+
+      .inventory-table th,
+      .inventory-table td {
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .inventory-table colgroup {
+        display: none;
+      }
+
+      .inventory-table th:nth-child(1),
+      .inventory-table td:nth-child(1) {
+        width: 20%;
+      }
+
+      .inventory-table th:nth-child(2),
+      .inventory-table td:nth-child(2) {
+        width: 25%;
+      }
+
+      .inventory-table th:nth-child(3),
+      .inventory-table td:nth-child(3) {
+        width: 60%;
+      }
+
+      .inventory-table .sku-cell {
+        font-size: 9px;
+      }
+
+      .inventory-table th:nth-child(2),
+      .inventory-table td:nth-child(2) {
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+
+      .col-mobile-hidden {
+        display: none;
+      }
+
+      .row-details {
+        display: block;
+      }
+
+      .portal-nav {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   </style>
@@ -367,19 +658,43 @@
 </head>
 <body>
   <header>
-  <div class="header-content">
-    <div class="header-left">
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <img src="" alt="Logo" id="headerLogo" style="display: none; height: 32px; width: auto; object-fit: contain;" />
-        <h1 id="headerTitle" style="font-size: 20px; font-weight: 600;">👨‍💼 Admin Portal</h1>
+    <div class="header-content">
+      <div class="logo-title">
+        <img src="" alt="Logo" class="header-logo" id="headerLogo" style="display: none;" />
+        <h1 id="headerTitle" class="header-title">Admin Portal</h1>
+      </div>
+      <div class="header-right">
+        <nav class="portal-nav">
+          <a href="index.html#create" class="nav-link">Create</a>
+          <a href="index.html#search" class="nav-link">SKU List</a>
+          <a href="inventory.html" class="nav-link active">Inventory</a>
+          <a href="index.html#settings" class="nav-link">Settings</a>
+          <a href="vendors.html" class="nav-link">Vendors</a>
+          <a href="payments.html" class="nav-link">Payments</a>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
       </div>
     </div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link">Create/Search</a>
-      <a href="inventory.html" class="nav-link active">📊 Inventory</a>
+  </header>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span>Admin Menu</span>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">&times;</button>
     </div>
-  </div>
-</header>
+    <a href="index.html#create" class="sidebar-link">Create</a>
+    <a href="index.html#search" class="sidebar-link">SKU List</a>
+    <a href="inventory.html" class="sidebar-link active">Inventory</a>
+    <a href="index.html#settings" class="sidebar-link">Settings</a>
+    <a href="vendors.html" class="sidebar-link">Vendors</a>
+    <a href="payments.html" class="sidebar-link">Payments</a>
+    <button class="sidebar-link logout" onclick="logout()">Logout</button>
+  </aside>
 
   <div class="container">
     <div class="page-header">
@@ -391,7 +706,14 @@
       <div class="stat-card">
         <div class="stat-header">
           <span class="stat-label">Total Products</span>
-          <span class="stat-icon">📦</span>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="7" height="7"></rect>
+              <rect x="14" y="4" width="7" height="7"></rect>
+              <rect x="3" y="13" width="7" height="7"></rect>
+              <rect x="14" y="13" width="7" height="7"></rect>
+            </svg>
+          </span>
         </div>
         <div class="stat-value" id="totalProducts">0</div>
       </div>
@@ -399,7 +721,11 @@
       <div class="stat-card success">
         <div class="stat-header">
           <span class="stat-label">In Stock</span>
-          <span class="stat-icon">✅</span>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+          </span>
         </div>
         <div class="stat-value" id="inStock">0</div>
       </div>
@@ -407,7 +733,13 @@
       <div class="stat-card warning">
         <div class="stat-header">
           <span class="stat-label">Low Stock</span>
-          <span class="stat-icon">⚠️</span>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l9 16H3l9-16z"></path>
+              <path d="M12 9v4"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
+          </span>
         </div>
         <div class="stat-value" id="lowStock">0</div>
       </div>
@@ -415,7 +747,12 @@
       <div class="stat-card danger">
         <div class="stat-header">
           <span class="stat-label">Out of Stock</span>
-          <span class="stat-icon">❌</span>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M9 9l6 6M15 9l-6 6"></path>
+            </svg>
+          </span>
         </div>
         <div class="stat-value" id="outOfStock">0</div>
       </div>
@@ -425,7 +762,7 @@
       <div class="card-header">
         <h2 class="card-title">All Inventory</h2>
         <button class="btn btn-primary" onclick="exportInventory()">
-          📥 Export CSV
+          Export CSV
         </button>
       </div>
 
@@ -459,24 +796,40 @@
       </div>
 
       <div class="table-container">
-        <table>
+        <table class="inventory-table">
+          <colgroup>
+            <col style="width: 4%;" />
+            <col style="width: 12%;" />
+            <col style="width: 30%;" />
+            <col style="width: 10%;" />
+            <col style="width: 8%;" />
+            <col style="width: 8%;" />
+            <col style="width: 12%;" />
+            <col style="width: 16%;" />
+          </colgroup>
           <thead>
             <tr>
-              <th>Alert</th>
+              <th class="col-mobile-hidden">Alert</th>
               <th>SKU</th>
               <th>Product Name</th>
-              <th>Vendor</th>
-              <th>Category</th>
+              <th class="col-mobile-hidden">Vendor</th>
+              <th class="col-mobile-hidden">Category</th>
               <th>Stock Qty</th>
-              <th>Status</th>
-              <th>Last Updated</th>
+              <th class="col-mobile-hidden">Status</th>
+              <th class="col-mobile-hidden">Last Updated</th>
             </tr>
           </thead>
           <tbody id="inventoryTable">
             <tr>
               <td colspan="8">
                 <div class="empty-state">
-                  <div class="empty-state-icon">📊</div>
+<div class="empty-state-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7l9-4 9 4-9 4-9-4z"></path>
+                  <path d="M3 7v10l9 4 9-4V7"></path>
+                  <path d="M12 11v10"></path>
+                </svg>
+              </div>
                   <h3>Loading inventory...</h3>
                   <p>Please wait while we fetch all products</p>
                 </div>
@@ -489,6 +842,38 @@
   </div>
 
   <script>
+    function setupSidebar() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const closeBtn = document.getElementById('sidebarClose');
+      if (!menuToggle || !sidebar || !backdrop || !closeBtn) return;
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+      }
+
+      menuToggle.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      backdrop.addEventListener('click', closeSidebar);
+      sidebar.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('click', closeSidebar);
+      });
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('jm_user');
+        window.location.href = '../index.html';
+      }
+    }
+
     let allInventory = [];
     let filteredInventory = [];
 
@@ -577,14 +962,23 @@
         
         return `
           <tr>
-            <td>${alertIcon}</td>
+            <td class="col-mobile-hidden">${alertIcon}</td>
             <td class="sku-cell">${item.sku}</td>
-            <td>${item.product_name || '-'}</td>
-            <td><span class="vendor-badge">${item.vendor_code}</span></td>
-            <td>${item.category_code}</td>
+            <td>
+              ${item.product_name || '-'}
+              <details class="row-details">
+                <summary>View more</summary>
+                <div class="detail-item"><span>Vendor:</span><span>${item.vendor_code}</span></div>
+                <div class="detail-item"><span>Category:</span><span>${item.category_code}</span></div>
+                <div class="detail-item"><span>Status:</span><span>${getStatusBadge(status)}</span></div>
+                <div class="detail-item"><span>Last Updated:</span><span>${lastUpdated}</span></div>
+              </details>
+            </td>
+            <td class="col-mobile-hidden"><span class="vendor-badge">${item.vendor_code}</span></td>
+            <td class="col-mobile-hidden">${item.category_code}</td>
             <td style="font-weight: 600;">${item.stock_quantity}</td>
-            <td>${getStatusBadge(status)}</td>
-            <td style="font-size: 12px; color: var(--text-light);">${lastUpdated}</td>
+            <td class="col-mobile-hidden">${getStatusBadge(status)}</td>
+            <td class="col-mobile-hidden" style="font-size: 12px; color: var(--text-light);">${lastUpdated}</td>
           </tr>
         `;
       }).join('');
@@ -688,7 +1082,13 @@
         <tr>
           <td colspan="8">
             <div class="empty-state">
-              <div class="empty-state-icon">📦</div>
+<div class="empty-state-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7l9-4 9 4-9 4-9-4z"></path>
+                  <path d="M3 7v10l9 4 9-4V7"></path>
+                  <path d="M12 11v10"></path>
+                </svg>
+              </div>
               <h3>${message}</h3>
             </div>
           </td>
@@ -700,10 +1100,14 @@
     logoManager.init({
       logoElementId: 'headerLogo',
       titleElementId: 'headerTitle',
-      fallbackText: '📊 Inventory Dashboard',
+      fallbackText: 'Admin Portal',
       pageType: 'Inventory Dashboard'
     });
+    setupSidebar();
     loadInventory();
   </script>
 </body>
 </html>
+
+
+
