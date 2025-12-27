@@ -91,7 +91,7 @@
         box-shadow: none;
       }
       html.pwa-standalone.pwa-ios body {
-        padding-top: env(safe-area-inset-top);
+        padding-top: 0;
       }
     `;
 
@@ -170,15 +170,33 @@
         header.style.left = '0';
         header.style.right = '0';
         header.style.width = '100%';
+        document.body.style.paddingTop = '0px';
 
         const spacerId = 'pwa-header-spacer';
-        if (!document.getElementById(spacerId)) {
-          const spacer = document.createElement('div');
+        let spacer = document.getElementById(spacerId);
+        if (!spacer) {
+          spacer = document.createElement('div');
           spacer.id = spacerId;
-          spacer.style.height = `${header.getBoundingClientRect().height}px`;
           header.parentNode.insertBefore(spacer, header.nextSibling);
         }
+        const updateSpacerHeight = () => {
+          spacer.style.height = `${header.getBoundingClientRect().height}px`;
+        };
+        updateSpacerHeight();
+        window.addEventListener('resize', updateSpacerHeight);
       }
+    });
+  };
+
+  const applySafeAreaToSidebars = () => {
+    if (!isIOS()) {
+      return;
+    }
+    const sidebars = document.querySelectorAll('.sidebar');
+    sidebars.forEach((sidebar) => {
+      const styles = window.getComputedStyle(sidebar);
+      const paddingTop = parseFloat(styles.paddingTop) || 0;
+      sidebar.style.paddingTop = `calc(env(safe-area-inset-top) + ${paddingTop}px)`;
     });
   };
 
@@ -350,6 +368,7 @@
     updateIcons();
     createSplash();
     applySafeAreaToHeaders();
+    applySafeAreaToSidebars();
     initPullToRefresh();
     showIOSBanner();
     registerServiceWorker();
