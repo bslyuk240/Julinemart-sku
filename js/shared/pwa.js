@@ -164,6 +164,21 @@
       header.style.paddingTop = `calc(env(safe-area-inset-top) + ${paddingTop}px)`;
       header.style.top = '0px';
       header.style.zIndex = styles.zIndex === 'auto' ? '200' : styles.zIndex;
+
+      if (isStandalone()) {
+        header.style.position = 'fixed';
+        header.style.left = '0';
+        header.style.right = '0';
+        header.style.width = '100%';
+
+        const spacerId = 'pwa-header-spacer';
+        if (!document.getElementById(spacerId)) {
+          const spacer = document.createElement('div');
+          spacer.id = spacerId;
+          spacer.style.height = `${header.getBoundingClientRect().height}px`;
+          header.parentNode.insertBefore(spacer, header.nextSibling);
+        }
+      }
     });
   };
 
