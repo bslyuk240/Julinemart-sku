@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // JulineMart Payment System - Shared Functions
 // Location: /js/shared/payments.js
 // ============================================
@@ -14,37 +14,37 @@ const PaymentSystem = {
     'pending_advance': {
       label: 'Advance Pending',
       color: '#f59e0b',
-      icon: '⏳',
+      icon: 'PEND',
       description: 'Waiting for 40% advance payment'
     },
     'advance_paid': {
       label: 'Advance Paid',
       color: '#3b82f6',
-      icon: '✅',
+      icon: 'ADV',
       description: 'Advance paid, awaiting hub delivery'
     },
     'hub_pending': {
       label: 'At Hub',
       color: '#8b5cf6',
-      icon: '🚚',
+      icon: 'HUB',
       description: 'Item at hub, awaiting verification'
     },
     'hub_verified': {
       label: 'Hub Verified',
       color: '#06b6d4',
-      icon: '✅',
+      icon: 'VER',
       description: 'Item verified, balance payment ready'
     },
     'completed': {
       label: 'Completed',
       color: '#10b981',
-      icon: '✅',
+      icon: 'DONE',
       description: 'Fully paid'
     },
     'rejected': {
       label: 'Rejected',
       color: '#ef4444',
-      icon: '❌',
+      icon: 'REJ',
       description: 'Item rejected at hub'
     }
   },
@@ -93,8 +93,8 @@ const PaymentSystem = {
 
   // Format currency (Nigerian Naira)
   formatCurrency(amount) {
-    if (amount === null || amount === undefined) return '₦0.00';
-    return '₦' + parseFloat(amount).toLocaleString('en-NG', {
+    if (amount === null || amount === undefined) return 'NGN 0.00';
+    return 'NGN ' + parseFloat(amount).toLocaleString('en-NG', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
@@ -129,7 +129,7 @@ const PaymentSystem = {
     const config = this.STATUS_CONFIG[status] || this.STATUS_CONFIG['pending_advance'];
     return `
       <span class="status-badge" style="background: ${config.color}20; color: ${config.color}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-        <span>${config.icon}</span>
+        
         <span>${config.label}</span>
       </span>
     `;
@@ -264,7 +264,7 @@ const PaymentSystem = {
     toast.innerHTML = `
       <div style="display: flex; align-items: center; gap: 12px;">
         <span style="font-size: 20px;">
-          ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
+          ${type === 'success' ? 'OK' : type === 'error' ? 'ERR' : type === 'warning' ? 'WARN' : 'INFO'}
         </span>
         <span>${message}</span>
       </div>
@@ -389,8 +389,8 @@ const PaymentSystem = {
     // Return existing client or create new one
     if (!this._supabaseClient) {
       const SUPABASE_URL = window.SUPABASE_URL || 'https://hnpwnjjjgxuelfognakp.supabase.co';
-      const SUPABASE_SERVICE_KEY = window.SUPABASE_SERVICE_ROLE_KEY || window.SUPABASE_ANON_KEY;
-      this._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+      this._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
     
     return this._supabaseClient;
@@ -399,3 +399,12 @@ const PaymentSystem = {
 
 // Make globally available
 window.PaymentSystem = PaymentSystem;
+
+
+
+
+
+
+
+
+

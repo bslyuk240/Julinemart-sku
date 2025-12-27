@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -502,6 +502,14 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
+  
+  <script>
+    if (['localhost','127.0.0.1'].includes(window.location.hostname)) {
+      const s = document.createElement('script');
+      s.src = '../js/shared/supabase.local.js';
+      document.head.appendChild(s);
+    }
+  </script>
   <script src="../js/shared/supabase.js"></script>
   <script src="../js/shared/logo.js"></script>
 </head>
@@ -555,7 +563,7 @@
   <h2 class="card-title" style="font-size: 12px;">Send Password Reset</h2>
   
   <div class="info-box">
-    <strong>📧 Password Reset Instructions:</strong>
+    <strong>?? Password Reset Instructions:</strong>
     <ul style="margin-left: 20px; margin-top: 8px;">
       <li>Enter the vendor's email address below</li>
       <li>They will receive an email with a link to set a new password</li>
@@ -580,7 +588,7 @@
     
     <div class="btn-group">
       <button type="submit" class="btn btn-primary">
-        📧 Send Password Reset Email
+        ?? Send Password Reset Email
       </button>
       <button type="button" class="btn btn-secondary" onclick="document.getElementById('resetPasswordForm').reset()">
         Clear
@@ -650,8 +658,8 @@
       }
     }
 
-    const SUPABASE_URL = window.SUPABASE_URL || 'https://hnpwnjjjgxuelfognakp.supabase.co';
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucHduampqZ3h1ZWxmb2duYWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3NTU2NDYsImV4cCI6MjA3NDMzMTY0Nn0.AVaBAzmddxnZz23YIu7IaeZzTEPI6n8CjyahRQvZSHk';
+    const SUPABASE_URL = window.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 
     let allVendors = [];
 
@@ -668,7 +676,7 @@
         const sb = getSupabase();
         if (!sb) throw new Error('Database not connected');
 
-        console.log('📊 Loading vendors...');
+        console.log('?? Loading vendors...');
 
         // Get all vendors
         const { data: vendors, error: vendorError } = await sb
@@ -678,7 +686,7 @@
 
         if (vendorError) throw vendorError;
 
-        console.log('✅ Found', vendors?.length || 0, 'vendor(s)');
+        console.log('? Found', vendors?.length || 0, 'vendor(s)');
 
         // Get product counts per vendor
         const { data: skus, error: skuError } = await sb
@@ -703,13 +711,13 @@
         renderVendors();
 
       } catch (error) {
-        console.error('❌ Error loading vendors:', error);
+        console.error('? Error loading vendors:', error);
         showError('Failed to load vendors: ' + error.message);
         document.getElementById('vendorsTable').innerHTML = `
           <tr>
             <td colspan="5">
               <div class="empty-state">
-                ⚠️ Error loading vendors<br>
+                ?? Error loading vendors<br>
                 <small>${error.message}</small>
               </div>
             </td>
@@ -726,7 +734,7 @@
           <tr>
             <td colspan="5">
               <div class="empty-state">
-                📦 No vendors found<br>
+                ?? No vendors found<br>
                 <small>Vendors appear after their first SKU is created</small>
               </div>
             </td>
@@ -747,7 +755,7 @@
             </details>
           </td>
           <td>
-            ${v.email ? `<span class="email-badge">📧 ${v.email}</span>` : '<span style="color: var(--text-light);">No email</span>'}
+            ${v.email ? `<span class="email-badge">?? ${v.email}</span>` : '<span style="color: var(--text-light);">No email</span>'}
           </td>
           <td class="col-mobile-hidden" style="font-weight: 600;">${v.product_count}</td>
           <td class="col-mobile-hidden" style="font-size: 12px; color: var(--text-light);">
@@ -799,7 +807,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
   resetBtn.textContent = 'Sending...';
   
   try {
-    console.log('📧 Sending password reset to:', email);
+    console.log('?? Sending password reset to:', email);
     
     const { error } = await getSupabase().auth.resetPasswordForEmail(email, {
   redirectTo: `${window.location.origin}/vendor/reset-password.html`
@@ -807,11 +815,11 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
     
     if (error) throw error;
     
-    showSuccess(`✅ Password reset email sent to ${email}`, 'resetSuccessMsg');
+    showSuccess(`? Password reset email sent to ${email}`, 'resetSuccessMsg');
     document.getElementById('resetPasswordForm').reset();
     
   } catch (error) {
-    console.error('❌ Reset error:', error);
+    console.error('? Reset error:', error);
     showError(`Failed to send reset email: ${error.message}`, 'resetErrorMsg');
   } finally {
     resetBtn.disabled = false;
@@ -821,3 +829,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
   </script>
 </body>
 </html>
+
+
+
+

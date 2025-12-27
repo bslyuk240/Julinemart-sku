@@ -1,8 +1,9 @@
 // Shared Supabase configuration for the JulineMart app
 // This file centralizes the Supabase URL and anon key so pages don't duplicate them.
 // If you need to change the project, update the values here.
-window.SUPABASE_URL = 'https://hnpwnjjjgxuelfognakp.supabase.co';
-window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucHduampqZ3h1ZWxmb2duYWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3NTU2NDYsImV4cCI6MjA3NDMzMTY0Nn0.AVaBAzmddxnZz23YIu7IaeZzTEPI6n8CjyahRQvZSHk';
+// Local overrides can be injected before this file via js/shared/supabase.local.js.
+window.SUPABASE_URL = window.SUPABASE_URL || 'https://hnpwnjjjgxuelfognakp.supabase.co';
+window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_-eRUvETP7n4hP4Zoj-xQ4g_WYBwrwOw';
 
 // Helpful: expose a small helper that returns the same names existing code expects
 // (pages call getSupabase(), which builds a client using SUPABASE_URL and SUPABASE_ANON_KEY).

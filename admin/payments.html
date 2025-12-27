@@ -733,6 +733,14 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7"></script>
+  
+  <script>
+    if (['localhost','127.0.0.1'].includes(window.location.hostname)) {
+      const s = document.createElement('script');
+      s.src = '../js/shared/supabase.local.js';
+      document.head.appendChild(s);
+    }
+  </script>
   <script src="../js/shared/supabase.js"></script>
   <script src="../js/shared/auth.js"></script>
   <script src="../js/shared/logo.js"></script>
@@ -790,18 +798,18 @@
       <div class="stat-card warning">
         <div class="stat-header">
           <span class="stat-label">Pending Advance</span>
-          <span class="stat-icon">⏳</span>
+          <span class="stat-icon"></span>
         </div>
         <div class="stat-value" id="statPendingAdvance">0</div>
         <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
-          <span id="statPendingAdvanceAmount">₦0.00</span>
+          <span id="statPendingAdvanceAmount">NGN 0.00</span>
         </div>
       </div>
 
       <div class="stat-card info">
         <div class="stat-header">
           <span class="stat-label">At Hub</span>
-          <span class="stat-icon">🚚</span>
+          <span class="stat-icon"></span>
         </div>
         <div class="stat-value" id="statAtHub">0</div>
         <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
@@ -812,22 +820,22 @@
       <div class="stat-card success">
         <div class="stat-header">
           <span class="stat-label">Balance Ready</span>
-          <span class="stat-icon">💰</span>
+          <span class="stat-icon"></span>
         </div>
         <div class="stat-value" id="statBalanceReady">0</div>
         <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
-          <span id="statBalanceReadyAmount">₦0.00</span>
+          <span id="statBalanceReadyAmount">NGN 0.00</span>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-header">
           <span class="stat-label">Completed Today</span>
-          <span class="stat-icon">✅</span>
+          <span class="stat-icon"></span>
         </div>
         <div class="stat-value" id="statCompletedToday">0</div>
         <div class="stat-help" style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
-          <span id="statCompletedTodayAmount">₦0.00</span>
+          <span id="statCompletedTodayAmount">NGN 0.00</span>
         </div>
       </div>
     </div>
@@ -838,10 +846,10 @@
         <h2 class="card-title">All Payments</h2>
         <div class="card-actions">
           <button class="btn btn-primary" onclick="openNewPaymentModal()">
-            ➕ Record New Order
+            Record New Order
           </button>
           <button class="btn btn-secondary" onclick="exportPayments()">
-            📥 Export CSV
+            Export CSV
           </button>
         </div>
       </div>
@@ -915,7 +923,7 @@
             <tr>
               <td colspan="10">
                 <div class="empty-state">
-                  <div class="empty-state-icon">📊</div>
+                  <div class="empty-state-icon">...</div>
                   <h3>Loading payments...</h3>
                   <p>Please wait while we fetch payment records</p>
                 </div>
@@ -964,7 +972,7 @@
           </div>
 
           <div class="form-group">
-            <label>Product Total (₦) <span class="required">*</span></label>
+            <label>Product Total (?) <span class="required">*</span></label>
             <input 
               type="number" 
               class="form-input" 
@@ -983,23 +991,23 @@
             <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
               <div style="display: flex; justify-content: space-between;">
                 <span>Product Total:</span>
-                <strong id="breakdownTotal">₦0.00</strong>
+                <strong id="breakdownTotal">NGN 0.00</strong>
               </div>
               <div style="display: flex; justify-content: space-between; color: var(--danger);">
                 <span>Commission (5%):</span>
-                <strong id="breakdownCommission">₦0.00</strong>
+                <strong id="breakdownCommission">NGN 0.00</strong>
               </div>
               <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border);">
                 <span>Vendor Earnings:</span>
-                <strong id="breakdownEarnings">₦0.00</strong>
+                <strong id="breakdownEarnings">NGN 0.00</strong>
               </div>
               <div style="display: flex; justify-content: space-between; color: var(--warning); margin-top: 8px;">
                 <span>Advance (40%):</span>
-                <strong id="breakdownAdvance">₦0.00</strong>
+                <strong id="breakdownAdvance">NGN 0.00</strong>
               </div>
               <div style="display: flex; justify-content: space-between; color: var(--success);">
                 <span>Balance (60%):</span>
-                <strong id="breakdownBalance">₦0.00</strong>
+                <strong id="breakdownBalance">NGN 0.00</strong>
               </div>
             </div>
           </div>
@@ -1084,7 +1092,7 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closePayAdvanceModal()">Cancel</button>
         <button class="btn btn-success" onclick="document.getElementById('payAdvanceForm').requestSubmit()">
-          ✅ Confirm Payment
+          ? Confirm Payment
         </button>
       </div>
     </div>
@@ -1135,7 +1143,7 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeMarkHubReceivedModal()">Cancel</button>
         <button class="btn btn-success" onclick="document.getElementById('markHubReceivedForm').requestSubmit()">
-          ✅ Confirm Receipt
+          ? Confirm Receipt
         </button>
       </div>
     </div>
@@ -1174,9 +1182,9 @@
             <label>Item Condition <span class="required">*</span></label>
             <select class="form-select" id="verifyCondition" required>
               <option value="">Select condition...</option>
-              <option value="good">✅ Good - Item matches description</option>
-              <option value="damaged">⚠️ Damaged - Item has issues</option>
-              <option value="wrong">❌ Wrong Item - Does not match order</option>
+              <option value="good">? Good - Item matches description</option>
+              <option value="damaged">Damaged - Item has issues</option>
+              <option value="wrong">? Wrong Item - Does not match order</option>
             </select>
           </div>
 
@@ -1221,10 +1229,10 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeVerifyItemModal()">Cancel</button>
         <button class="btn btn-danger" onclick="handleRejectItem()">
-          ❌ Reject Item
+          ? Reject Item
         </button>
         <button class="btn btn-success" onclick="document.getElementById('verifyItemForm').requestSubmit()">
-          ✅ Approve & Mark Balance Ready
+          ? Approve & Mark Balance Ready
         </button>
       </div>
     </div>
@@ -1293,7 +1301,7 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closePayBalanceModal()">Cancel</button>
         <button class="btn btn-success" onclick="document.getElementById('payBalanceForm').requestSubmit()">
-          ✅ Confirm Payment & Complete Order
+          ? Confirm Payment & Complete Order
         </button>
       </div>
     </div>
@@ -1490,7 +1498,7 @@
           <tr>
             <td colspan="10">
               <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-icon">...</div>
                 <h3>No payments found</h3>
                 <p>Click "Record New Order" to create your first payment record</p>
               </div>
@@ -1541,13 +1549,13 @@
             <td class="col-mobile-hidden">
               <div>${PaymentSystem.formatCurrency(payment.advance_amount)}</div>
               <div style="font-size: 11px; color: ${payment.advance_paid ? 'var(--success)' : 'var(--warning)'};">
-                ${payment.advance_paid ? '✅ Paid' : '⏳ Pending'}
+                ${payment.advance_paid ? 'Paid' : 'Pending'}
               </div>
             </td>
             <td class="col-mobile-hidden">
               <div>${PaymentSystem.formatCurrency(payment.balance_amount)}</div>
               <div style="font-size: 11px; color: ${payment.balance_paid ? 'var(--success)' : 'var(--text-light)'};">
-                ${payment.balance_paid ? '✅ Paid' : '⏳ Pending'}
+                ${payment.balance_paid ? 'Paid' : 'Pending'}
               </div>
             </td>
             <td>${PaymentSystem.getStatusBadge(payment.payment_status)}</td>
@@ -2377,7 +2385,7 @@
                 <!-- Advance Payment -->
                 <div style="background: ${payment.advance_paid ? '#d1fae5' : '#fef3c7'}; padding: 16px; border-radius: 8px; border: 1px solid ${payment.advance_paid ? '#10b981' : '#f59e0b'};">
                   <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: 600; font-size: 14px;">${payment.advance_paid ? '✅' : '⏳'} Advance Payment (40%)</span>
+                    <span style="font-weight: 600; font-size: 14px;">${payment.advance_paid ? '?' : '?'} Advance Payment (40%)</span>
                   </div>
                   <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${PaymentSystem.formatCurrency(payment.advance_amount)}</div>
                   ${payment.advance_paid ? `
@@ -2394,7 +2402,7 @@
                 <!-- Balance Payment -->
                 <div style="background: ${payment.balance_paid ? '#d1fae5' : '#fef3c7'}; padding: 16px; border-radius: 8px; border: 1px solid ${payment.balance_paid ? '#10b981' : '#f59e0b'};">
                   <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: 600; font-size: 14px;">${payment.balance_paid ? '✅' : '⏳'} Balance Payment (60%)</span>
+                    <span style="font-weight: 600; font-size: 14px;">${payment.balance_paid ? '?' : '?'} Balance Payment (60%)</span>
                   </div>
                   <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${PaymentSystem.formatCurrency(payment.balance_amount)}</div>
                   ${payment.balance_paid ? `
@@ -2416,7 +2424,7 @@
               <div style="background: var(--bg-gray); padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
                 <div style="display: flex; justify-content: space-between;">
                   <span>Received at Hub:</span>
-                  <strong>${payment.hub_received ? `✅ Yes (${PaymentSystem.formatDate(payment.hub_received_date)})` : '⏳ No'}</strong>
+                  <strong>${payment.hub_received ? `? Yes (${PaymentSystem.formatDate(payment.hub_received_date)})` : '? No'}</strong>
                 </div>
                 ${payment.hub_received ? `
                   <div style="display: flex; justify-content: space-between;">
@@ -2426,7 +2434,7 @@
                 ` : ''}
                 <div style="display: flex; justify-content: space-between;">
                   <span>Verified:</span>
-                  <strong>${payment.hub_verified ? `✅ Yes (${PaymentSystem.formatDate(payment.hub_verified_date)})` : '⏳ No'}</strong>
+                  <strong>${payment.hub_verified ? `? Yes (${PaymentSystem.formatDate(payment.hub_verified_date)})` : '? No'}</strong>
                 </div>
                 ${payment.hub_verified ? `
                   <div style="display: flex; justify-content: space-between;">
@@ -2537,6 +2545,10 @@
   </script>
 </body>
 </html>
+
+
+
+
 
 
 
