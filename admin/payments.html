@@ -386,6 +386,21 @@
     .btn-secondary:hover:not(:disabled) {
       background: #e5e7eb;
     }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
     
     /* Filters */
     .filters {
@@ -1338,6 +1353,8 @@
     let filteredPayments = [];
     let allVendors = [];
     let currentAdminUser = null;
+    let paymentDeleteEnabled = false;
+    const PAYMENT_DELETE_KEY = 'admin_payments_delete_enabled';
 
     // Initialize
     document.addEventListener('DOMContentLoaded', init);
@@ -1357,6 +1374,9 @@
       if (document.getElementById('advancePaymentDate')) {
         document.getElementById('advancePaymentDate').value = today;
       }
+
+      // Load settings
+      await loadPaymentDeleteSetting();
 
       // Load data
       await loadVendors();
@@ -1447,6 +1467,21 @@
       }
     }
 
+    async function loadPaymentDeleteSetting() {
+      const sb = PaymentSystem.getSupabase();
+      if (!sb) return;
+      const { data, error } = await sb
+        .from('settings')
+        .select('value')
+        .eq('key', PAYMENT_DELETE_KEY)
+        .maybeSingle();
+      if (error) {
+        console.warn('Failed to load payment delete setting:', error.message);
+        return;
+      }
+      paymentDeleteEnabled = data?.value === 'true';
+    }
+
     function renderPayments() {
       const tbody = document.getElementById('paymentsTable');
       
@@ -1467,6 +1502,11 @@
 
       tbody.innerHTML = filteredPayments.map(payment => {
         const nextAction = PaymentSystem.getNextAction(payment);
+        const deleteButton = paymentDeleteEnabled ? `
+          <button class="btn btn-danger" style="padding: 6px 12px;" onclick="deletePayment('${payment.id}')">
+            Delete
+          </button>
+        ` : '';
         
         return `
           <tr>
@@ -1483,7 +1523,7 @@
                 <div class="detail-item"><span>Earnings:</span><span>${PaymentSystem.formatCurrency(payment.vendor_earnings)}</span></div>
                 <div class="detail-item"><span>Advance:</span><span>${PaymentSystem.formatCurrency(payment.advance_amount)} ${payment.advance_paid ? '(Paid)' : '(Pending)'}</span></div>
                 <div class="detail-item"><span>Balance:</span><span>${PaymentSystem.formatCurrency(payment.balance_amount)} ${payment.balance_paid ? '(Paid)' : '(Pending)'}</span></div>
-                <div class="detail-actions">
+                <div class="detail-actions action-buttons">
                   ${nextAction.action !== 'view_only' ? `
                     <button class="btn" style="background: ${nextAction.color}; color: white; padding: 6px 12px;" onclick="handleAction('${nextAction.action}', '${payment.id}')">
                       ${nextAction.label}
@@ -1491,6 +1531,7 @@
                   ` : `
                     <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="viewPaymentDetails('${payment.id}')">View</button>
                   `}
+                  ${deleteButton}
                 </div>
               </details>
             </td>
@@ -1512,21 +1553,27 @@
             <td>${PaymentSystem.getStatusBadge(payment.payment_status)}</td>
             <td class="col-mobile-hidden">
               ${nextAction.action !== 'view_only' ? `
-                <button 
-                  class="btn" 
-                  style="background: ${nextAction.color}; color: white; padding: 6px 12px;"
-                  onclick="handleAction('${nextAction.action}', '${payment.id}')"
-                >
-                  ${nextAction.label}
-                </button>
+                <div class="action-buttons">
+                  <button 
+                    class="btn" 
+                    style="background: ${nextAction.color}; color: white; padding: 6px 12px;"
+                    onclick="handleAction('${nextAction.action}', '${payment.id}')"
+                  >
+                    ${nextAction.label}
+                  </button>
+                  ${deleteButton}
+                </div>
               ` : `
-                <button 
-                  class="btn btn-secondary" 
-                  style="padding: 6px 12px;"
-                  onclick="viewPaymentDetails('${payment.id}')"
-                >
-                  View
-                </button>
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-secondary" 
+                    style="padding: 6px 12px;"
+                    onclick="viewPaymentDetails('${payment.id}')"
+                  >
+                    View
+                  </button>
+                  ${deleteButton}
+                </div>
               `}
             </td>
           </tr>
@@ -2026,6 +2073,48 @@
         console.error('Error rejecting item:', error);
         PaymentSystem.hideLoading();
         PaymentSystem.showToast('Failed to reject item', 'error');
+      }
+    }
+
+    async function deletePayment(paymentId) {
+      if (!paymentDeleteEnabled) {
+        PaymentSystem.showToast('Payment deletion is disabled in settings.', 'warning');
+        return;
+      }
+
+      const payment = allPayments.find(p => p.id === paymentId);
+      if (!payment) return;
+
+      const confirmed = await PaymentSystem.showConfirm(
+        'Delete Payment',
+        `Delete Order #${payment.order_id}? This will remove the payment and any transactions.`
+      );
+      if (!confirmed) return;
+
+      try {
+        PaymentSystem.showLoading('Deleting payment...');
+        const sb = PaymentSystem.getSupabase();
+
+        const { error: txError } = await sb
+          .from('payment_transactions')
+          .delete()
+          .eq('payment_id', paymentId);
+        if (txError) throw txError;
+
+        const { error: paymentError } = await sb
+          .from('vendor_payments')
+          .delete()
+          .eq('id', paymentId);
+        if (paymentError) throw paymentError;
+
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Payment deleted successfully', 'success');
+        await loadPayments();
+        updateStats();
+      } catch (error) {
+        console.error('Error deleting payment:', error);
+        PaymentSystem.hideLoading();
+        PaymentSystem.showToast('Failed to delete payment', 'error');
       }
     }
 
