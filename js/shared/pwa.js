@@ -153,6 +153,100 @@
     });
   };
 
+  const applySafeAreaToHeaders = () => {
+    if (!isIOS()) {
+      return;
+    }
+    const headers = document.querySelectorAll('header');
+    headers.forEach((header) => {
+      const styles = window.getComputedStyle(header);
+      const paddingTop = parseFloat(styles.paddingTop) || 0;
+      header.style.paddingTop = `calc(env(safe-area-inset-top) + ${paddingTop}px)`;
+      header.style.top = '0px';
+      header.style.zIndex = styles.zIndex === 'auto' ? '200' : styles.zIndex;
+    });
+  };
+
+  const initPullToRefresh = () => {
+    if (!isStandalone()) {
+      return;
+    }
+
+    const indicator = document.createElement('div');
+    indicator.id = 'pwa-pull-refresh';
+    indicator.style.cssText = [
+      'position:fixed',
+      'left:16px',
+      'right:16px',
+      'top:calc(env(safe-area-inset-top) + 12px)',
+      'height:36px',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'background:rgba(45,27,105,0.9)',
+      'color:#fff',
+      'border-radius:18px',
+      'font-size:13px',
+      'font-weight:600',
+      'opacity:0',
+      'transform:translateY(-10px)',
+      'transition:opacity 0.2s ease, transform 0.2s ease',
+      'z-index:10001'
+    ].join(';');
+    indicator.textContent = 'Pull to refresh';
+    document.body.appendChild(indicator);
+
+    let startY = 0;
+    let pulling = false;
+    let triggered = false;
+
+    const onStart = (event) => {
+      if (document.scrollingElement && document.scrollingElement.scrollTop > 0) {
+        return;
+      }
+      startY = event.touches[0].clientY;
+      pulling = true;
+      triggered = false;
+    };
+
+    const onMove = (event) => {
+      if (!pulling) {
+        return;
+      }
+      const currentY = event.touches[0].clientY;
+      const delta = currentY - startY;
+      if (delta <= 0) {
+        return;
+      }
+      event.preventDefault();
+
+      const clamped = Math.min(delta, 90);
+      indicator.style.opacity = '1';
+      indicator.style.transform = `translateY(${Math.min(clamped / 3, 20)}px)`;
+      indicator.textContent = clamped > 70 ? 'Release to refresh' : 'Pull to refresh';
+      triggered = clamped > 70;
+    };
+
+    const onEnd = () => {
+      if (!pulling) {
+        return;
+      }
+      pulling = false;
+      if (triggered) {
+        indicator.textContent = 'Refreshing...';
+        indicator.style.transform = 'translateY(0)';
+        setTimeout(() => window.location.reload(), 200);
+        return;
+      }
+      indicator.style.opacity = '0';
+      indicator.style.transform = 'translateY(-10px)';
+    };
+
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd, { passive: true });
+  };
+
   const showInstallBanner = () => {
     if (localStorage.getItem(INSTALL_HINT_KEY) === '1') {
       return;
@@ -240,6 +334,8 @@
     injectStyles();
     updateIcons();
     createSplash();
+    applySafeAreaToHeaders();
+    initPullToRefresh();
     showIOSBanner();
     registerServiceWorker();
   });
