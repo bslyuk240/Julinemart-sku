@@ -326,10 +326,7 @@ export async function handler(event) {
     // Get payment details
     const { data: payment, error: paymentError } = await supabase
       .from('vendor_payments')
-      .select(`
-        *,
-        vendors!vendor_payments_vendor_code_fkey (vendor_name, email)
-      `)
+      .select('*')
       .eq('id', paymentId)
       .single();
 
@@ -350,11 +347,41 @@ export async function handler(event) {
       };
     }
 
-    const vendorEmail = payment.vendors?.email;
+    if (!payment.vendor_code) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Vendor code not found on payment', paymentId })
+      };
+    }
+
+    const { data: vendor, error: vendorError } = await supabase
+      .from('vendors')
+      .select('vendor_name, email')
+      .eq('vendor_code', payment.vendor_code)
+      .single();
+
+    if (vendorError || !vendor) {
+      console.error('Vendor lookup failed', {
+        vendorCode: payment.vendor_code,
+        vendorError: vendorError?.message || vendorError,
+        code: vendorError?.code,
+        details: vendorError?.details
+      });
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          error: 'Vendor not found',
+          vendorCode: payment.vendor_code,
+          supabaseError: vendorError?.message || null
+        })
+      };
+    }
+
+    const vendorEmail = vendor.email;
     if (!vendorEmail) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Vendor email not found' })
+        body: JSON.stringify({ error: 'Vendor email not found', vendorCode: payment.vendor_code })
       };
     }
 
@@ -369,7 +396,7 @@ export async function handler(event) {
 
     // Prepare email data
     const emailData = {
-      vendorName: payment.vendors?.vendor_name || payment.vendor_code,
+      vendorName: vendor.vendor_name || payment.vendor_code,
       orderId: payment.order_id,
       amount: emailType === 'advance_paid' ? payment.advance_amount : payment.balance_amount,
       paymentDate: emailType === 'advance_paid' ? payment.advance_paid_date : payment.balance_paid_date,
