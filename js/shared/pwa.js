@@ -405,6 +405,7 @@
       if (registration.waiting) {
         showUpdateToast(registration);
       }
+      registration.update().catch(() => {});
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (!newWorker) {

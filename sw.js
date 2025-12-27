@@ -1,4 +1,4 @@
-const CACHE_NAME = 'julinemart-pwa-v1';
+const CACHE_NAME = 'julinemart-pwa-v3';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -17,6 +17,7 @@ const PRECACHE_URLS = [
   '/js/shared/auth.js',
   '/js/shared/logo.js',
   '/js/shared/payments.js',
+  '/js/shared/jspdf.umd.min.js',
   '/js/shared/supabase.js',
   '/js/shared/supabase.local.example.js',
   '/js/shared/vendor-auth.js',
@@ -28,7 +29,6 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

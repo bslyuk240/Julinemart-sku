@@ -866,6 +866,7 @@
   </script>
   <script src="../js/shared/supabase.js"></script>
   <script src="../js/shared/logo.js"></script>
+  <script src="../js/shared/jspdf.umd.min.js"></script>
   <script src="../js/shared/payments.js"></script>
 </head>
 <body>
@@ -1037,8 +1038,9 @@
       <div class="receipt-modal-header">
         <div class="receipt-modal-title">Payment Receipt</div>
         <div class="receipt-modal-actions">
+          <button class="btn btn-secondary" id="downloadReceiptBtn" type="button">Download</button>
           <button class="btn btn-primary" id="printReceiptBtn" type="button">Print</button>
-          <button class="receipt-close" id="closeReceiptBtn" type="button">Close</button>
+          <button class="receipt-close" id="closeReceiptBtn" type="button" onclick="closeReceipt()">Close</button>
         </div>
       </div>
       <div class="receipt-body" id="receiptContent"></div>
@@ -1346,6 +1348,8 @@ ${payment.notes ? `\nNotes: ${payment.notes}` : ''}
       alert(details);
     }
 
+    let currentReceipt = null;
+
     async function viewReceipt(paymentId) {
       const payment = allPayments.find(p => p.id === paymentId);
       if (!payment) return;
@@ -1408,6 +1412,13 @@ ${payment.notes ? `\nNotes: ${payment.notes}` : ''}
         .total { background: #f9fafb; border-radius: 8px; padding: 12px; }
       `;
 
+      currentReceipt = {
+        orderId: payment.order_id,
+        html: receiptHtml,
+        styles,
+        payment
+      };
+
       const modal = document.getElementById('receiptModal');
       const content = document.getElementById('receiptContent');
       if (!modal || !content) return;
@@ -1424,8 +1435,110 @@ ${payment.notes ? `\nNotes: ${payment.notes}` : ''}
     }
 
     function printReceipt() {
+      if (!currentReceipt) {
+        PaymentSystem.showToast('Open a receipt before printing.', 'warning');
+        return;
+      }
       document.body.classList.add('printing');
       window.print();
+    }
+
+    function downloadReceipt() {
+      if (!currentReceipt || !currentReceipt.payment) {
+        PaymentSystem.showToast('Open a receipt before downloading.', 'warning');
+        return;
+      }
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        PaymentSystem.showToast('PDF tools not loaded yet. Please try again.', 'warning');
+        return;
+      }
+
+      const { payment, orderId } = currentReceipt;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const left = 40;
+      const right = pageWidth - 40;
+      const labelWidth = 170;
+      const valueWidth = right - left - labelWidth;
+      let y = 50;
+
+      const ensureSpace = (needed = 18) => {
+        if (y + needed > pageHeight - 40) {
+          doc.addPage();
+          y = 50;
+        }
+      };
+
+      const addHeader = () => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('JulineMart', left, y);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Receipt #${orderId}`, right, y, { align: 'right' });
+        y += 18;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Payment Receipt', left, y);
+        y += 12;
+        doc.setDrawColor(229, 231, 235);
+        doc.line(left, y, right, y);
+        y += 18;
+      };
+
+      const addSection = (title) => {
+        ensureSpace(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text(title, left, y);
+        y += 12;
+      };
+
+      const addRow = (label, value) => {
+        ensureSpace(18);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(label, left, y);
+        const text = value === undefined || value === null || value === '' ? '-' : String(value);
+        const lines = doc.splitTextToSize(text, valueWidth);
+        doc.text(lines, left + labelWidth, y);
+        y += Math.max(14, lines.length * 14);
+      };
+
+      addHeader();
+
+      addSection('Order Details');
+      addRow('Order Date', PaymentSystem.formatDate(payment.order_date));
+      addRow('Vendor', `${payment.vendor_code} - ${payment.vendor_name || payment.vendor_code}`);
+      addRow('Hub', payment.hub_name || '-');
+      addRow('Reference', payment.order_reference || '-');
+      y += 6;
+
+      addSection('Earnings');
+      addRow('Product Total', PaymentSystem.formatCurrency(payment.product_total));
+      addRow('Commission (5%)', `-${PaymentSystem.formatCurrency(payment.commission_amount)}`);
+      addRow('Your Earnings', PaymentSystem.formatCurrency(payment.vendor_earnings));
+      y += 6;
+
+      addSection('Advance Payment');
+      addRow('Amount', PaymentSystem.formatCurrency(payment.advance_amount));
+      addRow('Date', payment.advance_paid_date ? PaymentSystem.formatDate(payment.advance_paid_date) : '-');
+      addRow('Method', payment.advance_payment_method || '-');
+      addRow('Reference', payment.advance_payment_reference || '-');
+      y += 6;
+
+      addSection('Balance Payment');
+      addRow('Amount', PaymentSystem.formatCurrency(payment.balance_amount));
+      addRow('Date', payment.balance_paid_date ? PaymentSystem.formatDate(payment.balance_paid_date) : '-');
+      addRow('Method', payment.balance_payment_method || '-');
+      addRow('Reference', payment.balance_payment_reference || '-');
+      y += 6;
+
+      addSection('Status');
+      addRow('Payment Status', 'Paid in Full');
+
+      doc.save(`receipt-${orderId}.pdf`);
     }
 
     window.addEventListener('afterprint', () => {
@@ -1445,6 +1558,7 @@ ${payment.notes ? `\nNotes: ${payment.notes}` : ''}
       }
     });
     document.getElementById('printReceiptBtn')?.addEventListener('click', printReceipt);
+    document.getElementById('downloadReceiptBtn')?.addEventListener('click', downloadReceipt);
 
     function exportMyPayments() {
       if (filteredPayments.length === 0) {
