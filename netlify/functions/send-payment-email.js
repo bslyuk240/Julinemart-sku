@@ -306,8 +306,15 @@ export async function handler(event) {
     };
   }
 
+  console.log('send-payment-email invoked', {
+    method: event.httpMethod,
+    path: event.path,
+    hasBody: Boolean(event.body)
+  });
+
   try {
     const { paymentId, emailType } = JSON.parse(event.body);
+    console.log('send-payment-email payload', { paymentId, emailType });
 
     if (!paymentId || !emailType) {
       return {
@@ -327,9 +334,19 @@ export async function handler(event) {
       .single();
 
     if (paymentError || !payment) {
+      console.error('Payment lookup failed', {
+        paymentId,
+        paymentError: paymentError?.message || paymentError,
+        code: paymentError?.code,
+        details: paymentError?.details
+      });
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: 'Payment not found' })
+        body: JSON.stringify({
+          error: 'Payment not found',
+          paymentId,
+          supabaseError: paymentError?.message || null
+        })
       };
     }
 
@@ -383,10 +400,16 @@ export async function handler(event) {
     };
 
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email:', {
+      message: error?.message,
+      stack: error?.stack
+    });
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to send email', details: error.message })
+      body: JSON.stringify({
+        error: 'Failed to send email',
+        details: error?.message || 'Unknown error'
+      })
     };
   }
 }
