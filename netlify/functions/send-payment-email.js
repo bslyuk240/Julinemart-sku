@@ -4,13 +4,14 @@
 // ============================================
 
 import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Email configuration (configure in Netlify environment variables)
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.ionos.co.uk';
-const SMTP_PORT = process.env.SMTP_PORT || 587;
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@julinemart.com';
@@ -281,20 +282,35 @@ const EMAIL_TEMPLATES = {
   }
 };
 
-// Send email function (simplified - you'll need to implement actual SMTP sending)
+function createTransport() {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    throw new Error('SMTP configuration is incomplete');
+  }
+
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465,
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS
+    }
+  });
+}
+
+// Send email function (SMTP)
 async function sendEmail(to, subject, htmlBody) {
-  // For now, just log the email (implement actual SMTP sending using nodemailer)
-  console.log('📧 EMAIL TO SEND:');
-  console.log('To:', to);
-  console.log('Subject:', subject);
-  console.log('Body length:', htmlBody.length);
-  
-  // TODO: Implement actual SMTP sending using nodemailer
-  // const nodemailer = require('nodemailer');
-  // const transporter = nodemailer.createTransporter({ ... });
-  // await transporter.sendMail({ from, to, subject, html: htmlBody });
-  
-  return true;
+  const transporter = createTransport();
+  const from = `${FROM_NAME} <${FROM_EMAIL}>`;
+  const info = await transporter.sendMail({
+    from,
+    to,
+    subject,
+    html: htmlBody
+  });
+
+  console.log('Email sent', { messageId: info.messageId, to });
+  return info;
 }
 
 // Main handler
@@ -440,3 +456,5 @@ export async function handler(event) {
     };
   }
 }
+
+
