@@ -56,7 +56,7 @@
         position: fixed;
         left: 16px;
         right: 16px;
-        top: 16px;
+        top: calc(env(safe-area-inset-top) + 12px);
         background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
         color: #ffffff;
         border: none;
@@ -89,6 +89,9 @@
         background: rgba(255, 255, 255, 0.2);
         color: #ffffff;
         box-shadow: none;
+      }
+      html.pwa-standalone.pwa-ios body {
+        padding-top: env(safe-area-inset-top);
       }
     `;
 
@@ -228,6 +231,12 @@
   };
 
   document.addEventListener('DOMContentLoaded', () => {
+    if (isIOS()) {
+      document.documentElement.classList.add('pwa-ios');
+    }
+    if (isStandalone()) {
+      document.documentElement.classList.add('pwa-standalone');
+    }
     injectStyles();
     updateIcons();
     createSplash();
