@@ -480,7 +480,7 @@
 
       try {
         const { error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/vendor/index.html`
+          redirectTo: `${window.location.origin}/vendor/reset-password.html`
         });
 
         if (error) throw error;
