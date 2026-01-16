@@ -668,6 +668,8 @@
 
     const SUPABASE_URL = window.SUPABASE_URL;
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+    const SITE_BASE_URL = (window.SITE_URL || window.location.origin || 'https://sku.julinemart.com').replace(/\/+$/, '');
+    const RESET_PASSWORD_URL = `${SITE_BASE_URL}/vendor/reset-password.html`;
 
     let allVendors = [];
 
@@ -818,8 +820,8 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async (e
     console.log('Sending password reset to:', email);
     
     const { error } = await getSupabase().auth.resetPasswordForEmail(email, {
-  redirectTo: `${window.location.origin}/vendor/reset-password.html`
-});
+      redirectTo: RESET_PASSWORD_URL
+    });
     
     if (error) throw error;
     

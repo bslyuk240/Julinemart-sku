@@ -4,6 +4,7 @@
 // Local overrides can be injected before this file via js/shared/supabase.local.js.
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://hnpwnjjjgxuelfognakp.supabase.co';
 window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_-eRUvETP7n4hP4Zoj-xQ4g_WYBwrwOw';
+window.SITE_URL = window.SITE_URL || 'https://sku.julinemart.com';
 
 // Helpful: expose a small helper that returns the same names existing code expects
 // (pages call getSupabase(), which builds a client using SUPABASE_URL and SUPABASE_ANON_KEY).
